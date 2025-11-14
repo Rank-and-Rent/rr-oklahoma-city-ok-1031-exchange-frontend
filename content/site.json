@@ -1,0 +1,16 @@
+{
+  "company": "1031 Exchange Oklahoma City",
+  "phone": "",
+  "phoneDigits": "",
+  "mainCity": "Oklahoma City",
+  "state": "OK",
+  "services": [],
+  "servicesNav": [],
+  "locationsNav": [],
+  "extraLinks": [
+    {
+      "label": "Contact",
+      "href": "/contact"
+    }
+  ]
+}
