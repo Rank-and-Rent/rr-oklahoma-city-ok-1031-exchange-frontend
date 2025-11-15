@@ -8,7 +8,7 @@ interface ImageResult {
 }
 
 async function fetchCityImageFromUnsplash(city: string): Promise<string | null> {
-  // try {
+  try {
     // Use Unsplash API (no key required for basic usage)
     const searchTerm = city.replace('-tx', ' Texas').replace('-', ' ');
     const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchTerm)}&per_page=1&client_id=YOUR_ACCESS_KEY`, {
