@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType, SVGProps } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { motion } from "framer-motion";
@@ -9,6 +9,7 @@ import type { Variants } from "framer-motion";
 import HomeServicesSection from "./home-services-section";
 import HomeLocationsSection from "./home-locations-section";
 import HomeInventorySection from "./home-inventory-section";
+import { servicesData } from "@/data/services";
 import {
   ArrowUpRightIcon,
   ArrowPathIcon,
@@ -81,12 +82,12 @@ type FaqItem = {
 
 type LeadFormValues = {
   name: string;
+  company: string;
   email: string;
   phone: string;
-  property: string;
-  closeDate: string;
-  city: string;
-  message: string;
+  projectType: string;
+  timeline: string;
+  details: string;
 };
 
 const phoneNumber = "(832) 743-1964";
@@ -265,12 +266,12 @@ const irsLinks = {
 
 const initialFormValues: LeadFormValues = {
   name: "",
+  company: "",
   email: "",
   phone: "",
-  property: "",
-  closeDate: "",
-  city: "",
-  message: "",
+  projectType: "",
+  timeline: "",
+  details: "",
 };
 
 const sectionMotion: Variants = {
@@ -284,19 +285,69 @@ const sectionMotion: Variants = {
 
 export default function HomePageClient() {
   const [formValues, setFormValues] = useState<LeadFormValues>(initialFormValues);
-  const [errors, setErrors] = useState<Record<keyof LeadFormValues, string>>({
-    name: "",
-    email: "",
-    phone: "",
-    property: "",
-    closeDate: "",
-    city: "",
-    message: "",
-  });
+  const [projectTypeQuery, setProjectTypeQuery] = useState("");
+  const [projectTypeSuggestions, setProjectTypeSuggestions] = useState<string[]>([]);
+  const [errors, setErrors] = useState<Partial<Record<keyof LeadFormValues, string>>>({});
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const turnstileRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<string | null>(faqItems[0]?.question ?? null);
+
+  // Typeahead for project type
+  useEffect(() => {
+    if (projectTypeQuery.trim().length > 1) {
+      const sortedServices = [...servicesData].sort((a, b) => a.name.localeCompare(b.name));
+      const matches = sortedServices
+        .filter((s) => s.name.toLowerCase().includes(projectTypeQuery.toLowerCase()))
+        .map((s) => s.name)
+        .slice(0, 5);
+      setProjectTypeSuggestions(matches);
+    } else {
+      setProjectTypeSuggestions([]);
+    }
+  }, [projectTypeQuery]);
+
+  // Initialize Turnstile
+  useEffect(() => {
+    const initTurnstile = () => {
+      if (typeof window !== "undefined" && window.turnstile && turnstileRef.current) {
+        const widgetId = window.turnstile.render(turnstileRef.current, {
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
+          callback: (token: string) => {
+            setTurnstileToken(token);
+          },
+          "error-callback": () => {
+            setTurnstileToken("");
+          },
+          "expired-callback": () => {
+            setTurnstileToken("");
+          },
+        });
+        return () => {
+          if (widgetId && window.turnstile) {
+            window.turnstile.remove(widgetId);
+          }
+        };
+      }
+    };
+
+    if (typeof window !== "undefined" && window.turnstile) {
+      return initTurnstile();
+    }
+
+    const checkTurnstile = setInterval(() => {
+      if (typeof window !== "undefined" && window.turnstile) {
+        clearInterval(checkTurnstile);
+        initTurnstile();
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(checkTurnstile);
+    };
+  }, []);
 
   const organizationLd = useMemo(
     () => ({
@@ -352,15 +403,7 @@ export default function HomePageClient() {
   );
 
   const validateForm = (values: LeadFormValues) => {
-    const nextErrors: Record<keyof LeadFormValues, string> = {
-      name: "",
-      email: "",
-      phone: "",
-      property: "",
-      closeDate: "",
-      city: "",
-      message: "",
-    };
+    const nextErrors: Partial<Record<keyof LeadFormValues, string>> = {};
 
     if (!values.name.trim()) {
       nextErrors.name = "Name is required.";
@@ -375,44 +418,56 @@ export default function HomePageClient() {
     } else if (!/^[0-9()+\-\s.]{7,20}$/.test(values.phone.trim())) {
       nextErrors.phone = "Enter a valid phone number.";
     }
-    if (!values.property.trim()) {
-      nextErrors.property = "Provide the property being sold.";
+    if (!values.projectType.trim()) {
+      nextErrors.projectType = "Project type is required.";
     }
-    if (!values.closeDate) {
-      nextErrors.closeDate = "Estimated close date is required.";
-    }
-    if (!values.city.trim()) {
-      nextErrors.city = "City is required.";
-    }
-    if (!values.message.trim()) {
-      nextErrors.message = "Let us know what support you need.";
-    }
+
     return nextErrors;
   };
 
-  const handleInputChange =
-    (field: keyof LeadFormValues) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const value = event.target.value;
-      setFormValues((prev) => ({ ...prev, [field]: value }));
-      if (errors[field]) {
-        setErrors((prev) => ({ ...prev, [field]: "" }));
-      }
-      if (status !== "idle") {
-        setStatus("idle");
-        setStatusMessage("");
-      }
-    };
+  const handleInputChange = (field: keyof LeadFormValues) => (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    let value = event.target.value;
+    
+    // Prevent letters and special characters in phone input
+    if (field === "phone") {
+      value = value.replace(/[^\d\s\-()\+]/g, "");
+    }
+    
+    setFormValues((prev) => ({ ...prev, [field]: value }));
+    if (field === "projectType") {
+      setProjectTypeQuery(value);
+    }
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+    if (status !== "idle") {
+      setStatus("idle");
+      setStatusMessage("");
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setFormValues((prev) => ({ ...prev, projectType: suggestion }));
+    setProjectTypeQuery(suggestion);
+    setProjectTypeSuggestions([]);
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const validation = validateForm(formValues);
     setErrors(validation);
 
-    const hasErrors = Object.values(validation).some((error) => error.length > 0);
-    if (hasErrors) {
+    if (Object.keys(validation).length > 0) {
       setStatus("error");
       setStatusMessage("Please correct the highlighted fields.");
+      return;
+    }
+
+    if (!turnstileToken) {
+      setStatus("error");
+      setStatusMessage("Please complete the security verification.");
       return;
     }
 
@@ -424,7 +479,10 @@ export default function HomePageClient() {
       const response = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formValues),
+        body: JSON.stringify({
+          ...formValues,
+          turnstileToken,
+        }),
       });
 
       if (!response.ok) {
@@ -434,6 +492,12 @@ export default function HomePageClient() {
       setStatus("success");
       setStatusMessage("Thank you. A 1031 specialist will reach out shortly.");
       setFormValues(initialFormValues);
+      setProjectTypeQuery("");
+      setTurnstileToken("");
+      // Reset Turnstile
+      if (typeof window !== "undefined" && window.turnstile && turnstileRef.current) {
+        window.turnstile.reset();
+      }
     } catch (error) {
       console.error(error);
       setStatus("error");
@@ -445,6 +509,13 @@ export default function HomePageClient() {
 
   return (
     <div className={`${inter.variable} ${dmSerif.variable} bg-white text-slate-900`}>
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        strategy="lazyOnload"
+        onLoad={() => {
+          // Script loaded, Turnstile will initialize via useEffect
+        }}
+      />
       <Script id="jsonld-org" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(organizationLd)}
       </Script>
@@ -456,8 +527,19 @@ export default function HomePageClient() {
       </Script>
 
       <div className="bg-white">
-        <section className="bg-white">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 md:px-8 md:py-28 lg:grid-cols-[1.1fr_0.9fr]">
+        <section className="relative bg-white">
+          <div className="absolute inset-0 z-0">
+            <div className="relative h-full w-full">
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: 'url(/oklahoma-city-hero.jpg)',
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-white/75" />
+            </div>
+          </div>
+          <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 md:px-8 md:py-28 lg:grid-cols-[1.1fr_0.9fr]">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -504,88 +586,138 @@ export default function HomePageClient() {
               </div>
               <form className="space-y-5" onSubmit={handleSubmit} noValidate aria-live="polite">
                 <div className="grid gap-4 md:grid-cols-2">
-                  {[
-                    { label: "Name", field: "name", type: "text", autoComplete: "name" },
-                    { label: "Email", field: "email", type: "email", autoComplete: "email" },
-                    { label: "Phone", field: "phone", type: "tel", autoComplete: "tel" },
-                    { label: "City", field: "city", type: "text", autoComplete: "address-level2" },
-                  ].map((input) => (
-                    <label key={input.field} className="text-sm font-semibold text-slate-700">
-                      {input.label}
-                      <input
-                        type={input.type}
-                        autoComplete={input.autoComplete}
-                        value={formValues[input.field as keyof LeadFormValues]}
-                        onChange={handleInputChange(input.field as keyof LeadFormValues)}
-                        aria-invalid={Boolean(errors[input.field as keyof LeadFormValues])}
-                        aria-describedby={
-                          errors[input.field as keyof LeadFormValues] ? `${input.field}-error` : undefined
-                        }
-                        className="mt-1 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
-                      />
-                      {errors[input.field as keyof LeadFormValues] && (
-                        <span id={`${input.field}-error`} className="mt-1 block text-xs text-red-600">
-                          {errors[input.field as keyof LeadFormValues]}
-                        </span>
-                      )}
-                    </label>
-                  ))}
+                  <label className="text-sm font-semibold text-slate-700">
+                    Name *
+                    <input
+                      type="text"
+                      value={formValues.name}
+                      onChange={handleInputChange("name")}
+                      aria-invalid={Boolean(errors.name)}
+                      aria-describedby={errors.name ? "name-error" : undefined}
+                      className="mt-1 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
+                    />
+                    {errors.name && (
+                      <span id="name-error" className="mt-1 block text-xs text-red-600">
+                        {errors.name}
+                      </span>
+                    )}
+                  </label>
+
+                  <label className="text-sm font-semibold text-slate-700">
+                    Company
+                    <input
+                      type="text"
+                      value={formValues.company}
+                      onChange={handleInputChange("company")}
+                      className="mt-1 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
+                    />
+                  </label>
                 </div>
-                <label className="text-sm font-semibold text-slate-700">
-                  Property being sold
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="text-sm font-semibold text-slate-700">
+                    Email *
+                    <input
+                      type="email"
+                      value={formValues.email}
+                      onChange={handleInputChange("email")}
+                      aria-invalid={Boolean(errors.email)}
+                      aria-describedby={errors.email ? "email-error" : undefined}
+                      className="mt-1 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
+                    />
+                    {errors.email && (
+                      <span id="email-error" className="mt-1 block text-xs text-red-600">
+                        {errors.email}
+                      </span>
+                    )}
+                  </label>
+
+                  <label className="text-sm font-semibold text-slate-700">
+                    Phone *
+                    <input
+                      type="tel"
+                      value={formValues.phone}
+                      onChange={handleInputChange("phone")}
+                      aria-invalid={Boolean(errors.phone)}
+                      aria-describedby={errors.phone ? "phone-error" : undefined}
+                      className="mt-1 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
+                    />
+                    {errors.phone && (
+                      <span id="phone-error" className="mt-1 block text-xs text-red-600">
+                        {errors.phone}
+                      </span>
+                    )}
+                  </label>
+                </div>
+
+                <label className="relative block text-sm font-semibold text-slate-700">
+                  Project Type *
                   <input
                     type="text"
-                    value={formValues.property}
-                    onChange={handleInputChange("property")}
-                    aria-invalid={Boolean(errors.property)}
-                    aria-describedby={errors.property ? "property-error" : undefined}
+                    value={formValues.projectType}
+                    onChange={handleInputChange("projectType")}
+                    aria-invalid={Boolean(errors.projectType)}
+                    aria-describedby={errors.projectType ? "projectType-error" : undefined}
                     className="mt-1 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
+                    autoComplete="off"
                   />
-                  {errors.property && (
-                    <span id="property-error" className="mt-1 block text-xs text-red-600">
-                      {errors.property}
+                  {projectTypeSuggestions.length > 0 && (
+                    <ul className="absolute z-10 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg">
+                      {projectTypeSuggestions.map((suggestion, index) => (
+                        <li key={index}>
+                          <button
+                            type="button"
+                            onClick={() => handleSuggestionClick(suggestion)}
+                            className="w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                          >
+                            {suggestion}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {errors.projectType && (
+                    <span id="projectType-error" className="mt-1 block text-xs text-red-600">
+                      {errors.projectType}
                     </span>
                   )}
                 </label>
+
                 <label className="text-sm font-semibold text-slate-700">
-                  Estimated close date
-                  <input
-                    type="date"
-                    value={formValues.closeDate}
-                    onChange={handleInputChange("closeDate")}
-                    aria-invalid={Boolean(errors.closeDate)}
-                    aria-describedby={errors.closeDate ? "closeDate-error" : undefined}
+                  Timeline
+                  <select
+                    value={formValues.timeline}
+                    onChange={handleInputChange("timeline")}
                     className="mt-1 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
-                  />
-                  {errors.closeDate && (
-                    <span id="closeDate-error" className="mt-1 block text-xs text-red-600">
-                      {errors.closeDate}
-                    </span>
-                  )}
+                  >
+                    <option value="">Select timeline</option>
+                    <option value="immediate">Immediate (within 30 days)</option>
+                    <option value="45-days">45 days (identification deadline)</option>
+                    <option value="180-days">180 days (closing deadline)</option>
+                    <option value="planning">Planning phase</option>
+                  </select>
                 </label>
+
                 <label className="text-sm font-semibold text-slate-700">
-                  Message
+                  Details
                   <textarea
-                    value={formValues.message}
-                    onChange={handleInputChange("message")}
-                    aria-invalid={Boolean(errors.message)}
-                    aria-describedby={errors.message ? "message-error" : undefined}
-                    rows={3}
+                    value={formValues.details}
+                    onChange={handleInputChange("details")}
+                    rows={4}
                     className="mt-1 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
                   />
-                  {errors.message && (
-                    <span id="message-error" className="mt-1 block text-xs text-red-600">
-                      {errors.message}
-                    </span>
-                  )}
                 </label>
+
+                <div ref={turnstileRef} className="flex justify-center" />
+
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !turnstileToken}
                   className="inline-flex w-full items-center justify-center rounded-full bg-[#EAB308] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-slate-900 transition hover:bg-[#d49a04] disabled:cursor-not-allowed disabled:opacity-75"
                 >
-                  {isSubmitting ? "Sending..." : "Submit request"}
+                  {isSubmitting ? "Sending..." : "Submit Request"}
                 </button>
+
                 <div className="text-center text-sm text-slate-500" role="status" aria-live="polite">
                   {statusMessage && (
                     <span className={status === "error" ? "text-red-600" : "text-emerald-600"}>{statusMessage}</span>
@@ -909,5 +1041,21 @@ export default function HomePageClient() {
       </div>
     </div>
   );
+}
+
+// Extend Window interface for Turnstile
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (element: HTMLElement | null, options: {
+        sitekey: string;
+        callback: (token: string) => void;
+        "error-callback"?: () => void;
+        "expired-callback"?: () => void;
+      }) => string;
+      remove: (widgetId: string) => void;
+      reset: () => void;
+    };
+  }
 }
 

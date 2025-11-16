@@ -11,6 +11,8 @@ import Image from "next/image";
 import {
   ChevronDownIcon,
   ArrowUpRightIcon,
+  Bars3Icon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
 const tools = [
@@ -25,6 +27,7 @@ export default function Header() {
   const [locationsOpen, setLocationsOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const servicesRef = useRef<HTMLDivElement>(null);
   const locationsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -63,6 +66,7 @@ export default function Header() {
         setLocationsOpen(false);
         setToolsOpen(false);
         setInventoryOpen(false);
+        setMobileMenuOpen(false);
       }
     }
 
@@ -444,14 +448,146 @@ export default function Header() {
           >
             Contact
           </Link>
-          <Link
-            href={PHONE_HREF}
-            className="inline-flex rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-900 transition hover:border-slate-900 md:hidden"
+          <button
+            type="button"
+            className="inline-flex rounded-lg p-2 text-slate-700 transition hover:bg-slate-100 md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+            aria-expanded={mobileMenuOpen}
           >
-            Call {PHONE_NUMBER}
-          </Link>
+            {mobileMenuOpen ? (
+              <XMarkIcon className="h-6 w-6" />
+            ) : (
+              <Bars3Icon className="h-6 w-6" />
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="border-t border-slate-200 bg-white md:hidden">
+          <nav className="mx-auto max-w-7xl px-6 py-4">
+            <div className="space-y-4">
+              <div>
+                <Link
+                  href="/services"
+                  className="block py-2 text-sm font-semibold text-slate-900"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Services ({servicesData.length})
+                </Link>
+                <ul className="ml-4 mt-2 space-y-2">
+                  {servicesData.slice(0, 6).map((service) => (
+                    <li key={service.slug}>
+                      <Link
+                        href={service.route}
+                        className="block py-1 text-sm text-slate-600"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {service.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <Link
+                  href="/service-areas"
+                  className="block py-2 text-sm font-semibold text-slate-900"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Locations ({locationsData.length})
+                </Link>
+                <ul className="ml-4 mt-2 space-y-2">
+                  {topLocations.slice(0, 6).map((location) => (
+                    <li key={location.slug}>
+                      <Link
+                        href={location.route}
+                        className="block py-1 text-sm text-slate-600"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {location.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <Link
+                  href="/tools"
+                  className="block py-2 text-sm font-semibold text-slate-900"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Tools
+                </Link>
+                <ul className="ml-4 mt-2 space-y-2">
+                  {tools.map((tool) => (
+                    <li key={tool.href}>
+                      <Link
+                        href={tool.href}
+                        className="block py-1 text-sm text-slate-600"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {tool.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <Link
+                  href="/inventory"
+                  className="block py-2 text-sm font-semibold text-slate-900"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Inventory ({propertyTypesData.length})
+                </Link>
+                <ul className="ml-4 mt-2 space-y-2">
+                  {propertyTypesData.slice(0, 6).map((item) => (
+                    <li key={item.slug}>
+                      <Link
+                        href={item.route}
+                        className="block py-1 text-sm text-slate-600"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="border-t border-slate-200 pt-4">
+                <Link
+                  href="/blog"
+                  className="block py-2 text-sm font-medium text-slate-700"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+                <Link
+                  href="/about"
+                  className="block py-2 text-sm font-medium text-slate-700"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  About
+                </Link>
+                <Link
+                  href="/contact"
+                  className="mt-4 block rounded-full bg-[#1E3A8A] px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#162d63]"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Contact Us
+                </Link>
+              </div>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
