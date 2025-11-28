@@ -16,6 +16,9 @@ type FormValues = {
   email: string;
   phone: string;
   projectType: string;
+  property: string;
+  estimatedCloseDate: string;
+  city: string;
   timeline: string;
   details: string;
 };
@@ -29,6 +32,9 @@ export default function ContactForm({ initialProjectType = "", initialCity = "" 
     email: "",
     phone: "",
     projectType: initialProjectType || searchParams.get("projectType") || "",
+    property: "",
+    estimatedCloseDate: "",
+    city: initialCity || searchParams.get("city") || "",
     timeline: "",
     details: "",
   });
@@ -206,6 +212,9 @@ export default function ContactForm({ initialProjectType = "", initialCity = "" 
         email: "",
         phone: "",
         projectType: "",
+        property: "",
+        estimatedCloseDate: "",
+        city: "",
         timeline: "",
         details: "",
       });
@@ -334,6 +343,39 @@ export default function ContactForm({ initialProjectType = "", initialCity = "" 
           </span>
         )}
       </label>
+
+      <label className="text-sm font-semibold text-slate-700">
+        Property Being Sold
+        <input
+          type="text"
+          value={formValues.property}
+          onChange={handleInputChange("property")}
+          placeholder="Include property type, location, and estimated value (optional)"
+          className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
+        />
+      </label>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="text-sm font-semibold text-slate-700">
+          Estimated Close Date
+          <input
+            type="date"
+            value={formValues.estimatedCloseDate}
+            onChange={handleInputChange("estimatedCloseDate")}
+            className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
+          />
+        </label>
+        <label className="text-sm font-semibold text-slate-700">
+          City
+          <input
+            type="text"
+            value={formValues.city}
+            onChange={handleInputChange("city")}
+            placeholder="Primary metro or submarket (optional)"
+            className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20"
+          />
+        </label>
+      </div>
 
       <label className="text-sm font-semibold text-slate-700">
         Timeline
