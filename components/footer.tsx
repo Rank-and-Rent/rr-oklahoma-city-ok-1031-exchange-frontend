@@ -112,7 +112,7 @@ export default function Footer() {
             <h3 className="font-heading text-sm uppercase tracking-wider">
               Oklahoma 1031 Exchange Services
             </h3>
-            <div className="mt-4 grid grid-cols-2 gap-x-8 gap-y-1">
+            <div className="mt-4 grid grid-cols-2 gap-x-8 gap-y-4">
               <div>
                 <h4 className="mb-2 text-xs font-semibold text-gray-900">Services</h4>
                 <ul className="space-y-1 text-sm text-gray-600">
@@ -126,16 +126,41 @@ export default function Footer() {
                 </ul>
               </div>
               <div>
+                <h4 className="mb-2 text-xs font-semibold text-gray-900">Property Types</h4>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li>
+                    <Link href="/property-types/triple-net-nnn" className="hover:text-gray-900">
+                      Triple Net (NNN)
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/property-types/multi-family" className="hover:text-gray-900">
+                      Multi-Family
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/property-types/commercial" className="hover:text-gray-900">
+                      Commercial
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/property-types/industrial" className="hover:text-gray-900">
+                      Industrial
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div>
                 <h4 className="mb-2 text-xs font-semibold text-gray-900">Neighborhoods</h4>
                 <ul className="space-y-1 text-sm text-gray-600">
                   {locationsData.slice(0, 4).map((location) => (
-                <li key={location.slug}>
+                    <li key={location.slug}>
                       <Link href={location.route} className="hover:text-gray-900">
-                    {location.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                        {location.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
           </div>
           

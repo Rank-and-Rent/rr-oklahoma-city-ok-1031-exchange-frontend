@@ -90,9 +90,9 @@ export default function Header() {
           </Link>
           <Link 
             className="transition-opacity hover:opacity-70" 
-            href="/inventory"
+            href="/property-types"
           >
-            Inventory
+            Property Types
           </Link>
           <Link 
             className="transition-opacity hover:opacity-70" 
@@ -229,11 +229,11 @@ export default function Header() {
                 <ul className="space-y-2">
                   <li>
                     <Link
-                      href="/inventory"
+                      href="/property-types"
                       className="block text-sm font-medium text-gray-900"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Inventory
+                      Property Types
                     </Link>
                   </li>
                   <li>

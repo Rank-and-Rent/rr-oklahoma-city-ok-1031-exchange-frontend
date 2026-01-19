@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { SITE_URL } from "@/lib/config";
+import { SITE_URL, PHONE_HREF, PHONE_NUMBER } from "@/lib/config";
 import { propertyTypesData } from "@/data/property-types";
+import { ArrowUpRightIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = {
-  title: "1031 Exchange Property Types",
-  description: "Explore property types that qualify for 1031 exchange treatment. Multifamily, industrial, retail, office, and more.",
+  title: "1031 Exchange Property Types | Oklahoma City",
+  description: "Explore property types that qualify for 1031 exchange treatment. Triple Net, Multi-Family, Commercial, Industrial, Retail, and more.",
   alternates: {
     canonical: `${SITE_URL}/property-types`,
   },
@@ -28,7 +29,10 @@ export default function PropertyTypesPage() {
         <div className="absolute inset-0 bg-black/40" />
         
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center text-white">
-          <h1 className="font-heading text-5xl uppercase tracking-wide md:text-6xl lg:text-7xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/80">
+            1031 Exchange Eligible
+          </p>
+          <h1 className="mt-4 font-heading text-5xl uppercase tracking-wide md:text-6xl lg:text-7xl">
             Property Types
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-white/90">
@@ -79,7 +83,7 @@ export default function PropertyTypesPage() {
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="grid gap-x-12 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
             {propertyTypesData.map((item) => {
-              const heroImageSrc = item.heroImage || `/inventory/${item.slug}-oklahoma-1031-exchange.jpg`;
+              const heroImageSrc = item.heroImage || `/locations/oklahoma-city-ok-1031-exchange.jpg`;
               
               return (
                 <Link
@@ -88,28 +92,24 @@ export default function PropertyTypesPage() {
                   className="group"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    {item.heroImage ? (
-                      <Image
-                        src={heroImageSrc}
-                        alt={item.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gray-800 flex items-center justify-center">
-                        <span className="font-heading text-2xl text-gray-600">{item.name}</span>
-                      </div>
-                    )}
+                    <Image
+                      src={heroImageSrc}
+                      alt={item.name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   </div>
-                  <div className="mt-6 text-center">
-                    <h2 className="font-heading text-xl uppercase tracking-wide">
+                  <div className="mt-6">
+                    <h2 className="font-heading text-xl uppercase tracking-wide text-white">
                       {item.name}
                     </h2>
-                    <p className="mt-2 text-sm text-gray-400">
-                      Available for 1031 exchange replacement.
-                    </p>
+                    {item.description && (
+                      <p className="mt-2 text-sm text-gray-400 line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
                   </div>
                 </Link>
               );
@@ -141,9 +141,18 @@ export default function PropertyTypesPage() {
             Our team helps you identify the right property types for your 1031 exchange. 
             Contact us today to explore available inventory nationwide.
           </p>
-          <Link href="/contact" className="btn-primary mt-8 bg-white text-gray-900 hover:bg-gray-100">
-            Contact Us
-          </Link>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Link href="/contact" className="btn-white inline-flex items-center gap-2">
+              Get Started <ArrowUpRightIcon className="h-4 w-4" />
+            </Link>
+            <Link
+              href={PHONE_HREF}
+              className="inline-flex items-center gap-2 rounded-none border border-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-white hover:text-gray-900"
+            >
+              <PhoneIcon className="h-4 w-4" />
+              Call {PHONE_NUMBER}
+            </Link>
+          </div>
         </div>
       </section>
     </div>

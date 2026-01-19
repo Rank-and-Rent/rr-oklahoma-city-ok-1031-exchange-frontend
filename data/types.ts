@@ -22,6 +22,7 @@ export interface PropertyTypeItem {
   name: string;
   route: Slug;
   heroImage?: string;
+  description?: string;
 }
 
 export interface InventoryCategory {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BanknotesIcon } from "@heroicons/react/24/outline";
 
 type CostBreakdown = {
   qiFee: number;
@@ -90,7 +89,6 @@ export default function ExchangeCostEstimator() {
     }
   };
 
-  // Auto-calculate when all fields are filled
   useEffect(() => {
     if (propertyValue && qiFeePercentage && escrowFee !== "" && titleInsuranceRate && recordingFees !== "") {
       const propValue = parseFloat(propertyValue);
@@ -124,20 +122,22 @@ export default function ExchangeCostEstimator() {
   }, [propertyValue, qiFeePercentage, escrowFee, titleInsuranceRate, recordingFees]);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
-      <div className="mb-6 flex items-center gap-3">
-        <BanknotesIcon className="h-8 w-8 text-[#1E3A8A]" />
-        <h2 className="text-2xl font-semibold text-slate-900">Exchange Cost Estimator</h2>
-      </div>
+    <div className="rounded-xl border border-gray-700 bg-gray-800/80 p-8 md:p-10">
+      <h2 className="font-heading text-2xl uppercase tracking-wide text-white md:text-3xl">
+        Estimate Your Costs
+      </h2>
+      <p className="mt-2 text-gray-400">
+        Enter your property details to estimate exchange costs.
+      </p>
 
-      <div className="space-y-6">
+      <div className="mt-8 space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <label htmlFor="propertyValue" className="block text-sm font-semibold text-slate-700 mb-2">
+            <label htmlFor="propertyValue" className="block text-sm font-medium uppercase tracking-wider text-gray-300">
               Property Value
             </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+            <div className="relative mt-2">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
               <input
                 id="propertyValue"
                 type="text"
@@ -145,22 +145,21 @@ export default function ExchangeCostEstimator() {
                 value={propertyValue}
                 onChange={(e) => handleInputChange("propertyValue", e.target.value)}
                 className={`w-full rounded-lg border ${
-                  errors.propertyValue ? "border-red-500" : "border-slate-300"
-                } bg-white pl-8 pr-4 py-3 text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20`}
+                  errors.propertyValue ? "border-red-500" : "border-gray-600"
+                } bg-gray-900 pl-8 pr-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-white`}
                 placeholder="0"
               />
             </div>
             {errors.propertyValue && (
-              <p className="mt-1 text-sm text-red-600">{errors.propertyValue}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.propertyValue}</p>
             )}
-            <p className="mt-1 text-xs text-slate-500">The value of the property in the exchange</p>
           </div>
 
           <div>
-            <label htmlFor="qiFeePercentage" className="block text-sm font-semibold text-slate-700 mb-2">
-              QI Fee Percentage (%)
+            <label htmlFor="qiFeePercentage" className="block text-sm font-medium uppercase tracking-wider text-gray-300">
+              QI Fee Percentage
             </label>
-            <div className="relative">
+            <div className="relative mt-2">
               <input
                 id="qiFeePercentage"
                 type="text"
@@ -168,24 +167,23 @@ export default function ExchangeCostEstimator() {
                 value={qiFeePercentage}
                 onChange={(e) => handleInputChange("qiFeePercentage", e.target.value)}
                 className={`w-full rounded-lg border ${
-                  errors.qiFeePercentage ? "border-red-500" : "border-slate-300"
-                } bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20`}
+                  errors.qiFeePercentage ? "border-red-500" : "border-gray-600"
+                } bg-gray-900 px-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-white`}
                 placeholder="1.0"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">%</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">%</span>
             </div>
             {errors.qiFeePercentage && (
-              <p className="mt-1 text-sm text-red-600">{errors.qiFeePercentage}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.qiFeePercentage}</p>
             )}
-            <p className="mt-1 text-xs text-slate-500">Typical range: 0.5% - 2% of property value</p>
           </div>
 
           <div>
-            <label htmlFor="escrowFee" className="block text-sm font-semibold text-slate-700 mb-2">
+            <label htmlFor="escrowFee" className="block text-sm font-medium uppercase tracking-wider text-gray-300">
               Escrow Fee
             </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+            <div className="relative mt-2">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
               <input
                 id="escrowFee"
                 type="text"
@@ -193,22 +191,21 @@ export default function ExchangeCostEstimator() {
                 value={escrowFee}
                 onChange={(e) => handleInputChange("escrowFee", e.target.value)}
                 className={`w-full rounded-lg border ${
-                  errors.escrowFee ? "border-red-500" : "border-slate-300"
-                } bg-white pl-8 pr-4 py-3 text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20`}
+                  errors.escrowFee ? "border-red-500" : "border-gray-600"
+                } bg-gray-900 pl-8 pr-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-white`}
                 placeholder="500"
               />
             </div>
             {errors.escrowFee && (
-              <p className="mt-1 text-sm text-red-600">{errors.escrowFee}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.escrowFee}</p>
             )}
-            <p className="mt-1 text-xs text-slate-500">Escrow and closing coordination fees</p>
           </div>
 
           <div>
-            <label htmlFor="titleInsuranceRate" className="block text-sm font-semibold text-slate-700 mb-2">
-              Title Insurance Rate (%)
+            <label htmlFor="titleInsuranceRate" className="block text-sm font-medium uppercase tracking-wider text-gray-300">
+              Title Insurance Rate
             </label>
-            <div className="relative">
+            <div className="relative mt-2">
               <input
                 id="titleInsuranceRate"
                 type="text"
@@ -216,24 +213,23 @@ export default function ExchangeCostEstimator() {
                 value={titleInsuranceRate}
                 onChange={(e) => handleInputChange("titleInsuranceRate", e.target.value)}
                 className={`w-full rounded-lg border ${
-                  errors.titleInsuranceRate ? "border-red-500" : "border-slate-300"
-                } bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20`}
+                  errors.titleInsuranceRate ? "border-red-500" : "border-gray-600"
+                } bg-gray-900 px-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-white`}
                 placeholder="0.5"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">%</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">%</span>
             </div>
             {errors.titleInsuranceRate && (
-              <p className="mt-1 text-sm text-red-600">{errors.titleInsuranceRate}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.titleInsuranceRate}</p>
             )}
-            <p className="mt-1 text-xs text-slate-500">Typical range: 0.3% - 0.8% of property value</p>
           </div>
 
-          <div>
-            <label htmlFor="recordingFees" className="block text-sm font-semibold text-slate-700 mb-2">
+          <div className="md:col-span-2 md:w-1/2">
+            <label htmlFor="recordingFees" className="block text-sm font-medium uppercase tracking-wider text-gray-300">
               Recording Fees
             </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+            <div className="relative mt-2">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
               <input
                 id="recordingFees"
                 type="text"
@@ -241,55 +237,49 @@ export default function ExchangeCostEstimator() {
                 value={recordingFees}
                 onChange={(e) => handleInputChange("recordingFees", e.target.value)}
                 className={`w-full rounded-lg border ${
-                  errors.recordingFees ? "border-red-500" : "border-slate-300"
-                } bg-white pl-8 pr-4 py-3 text-slate-900 outline-none transition focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/20`}
+                  errors.recordingFees ? "border-red-500" : "border-gray-600"
+                } bg-gray-900 pl-8 pr-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-white`}
                 placeholder="100"
               />
             </div>
             {errors.recordingFees && (
-              <p className="mt-1 text-sm text-red-600">{errors.recordingFees}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.recordingFees}</p>
             )}
-            <p className="mt-1 text-xs text-slate-500">County recording fees (varies by county)</p>
           </div>
         </div>
 
         <button
           type="button"
           onClick={calculateCosts}
-          className="w-full rounded-full bg-[#1E3A8A] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#162d63] md:w-auto"
+          className="btn-white w-full md:w-auto"
         >
           Calculate Costs
         </button>
 
         {results && (
-          <div className="mt-8 rounded-lg border border-slate-200 bg-slate-50 p-6">
-            <h3 className="mb-4 text-lg font-semibold text-slate-900">Cost Breakdown</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between border-b border-slate-200 pb-2">
-                <span className="text-sm text-slate-600">QI Fee:</span>
-                <span className="text-sm font-semibold text-slate-900">{formatCurrency(results.qiFee)}</span>
+          <div className="mt-8 rounded-lg border border-gray-600 bg-gray-900 p-6">
+            <h3 className="font-heading text-xl uppercase tracking-wide text-white">Cost Breakdown</h3>
+            <div className="mt-4 space-y-3">
+              <div className="flex justify-between border-b border-gray-700 pb-3">
+                <span className="text-gray-400">QI Fee:</span>
+                <span className="font-semibold text-white">{formatCurrency(results.qiFee)}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-200 pb-2">
-                <span className="text-sm text-slate-600">Escrow Fee:</span>
-                <span className="text-sm font-semibold text-slate-900">{formatCurrency(results.escrowFee)}</span>
+              <div className="flex justify-between border-b border-gray-700 pb-3">
+                <span className="text-gray-400">Escrow Fee:</span>
+                <span className="font-semibold text-white">{formatCurrency(results.escrowFee)}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-200 pb-2">
-                <span className="text-sm text-slate-600">Title Insurance:</span>
-                <span className="text-sm font-semibold text-slate-900">{formatCurrency(results.titleInsurance)}</span>
+              <div className="flex justify-between border-b border-gray-700 pb-3">
+                <span className="text-gray-400">Title Insurance:</span>
+                <span className="font-semibold text-white">{formatCurrency(results.titleInsurance)}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-200 pb-2">
-                <span className="text-sm text-slate-600">Recording Fees:</span>
-                <span className="text-sm font-semibold text-slate-900">{formatCurrency(results.recordingFees)}</span>
+              <div className="flex justify-between border-b border-gray-700 pb-3">
+                <span className="text-gray-400">Recording Fees:</span>
+                <span className="font-semibold text-white">{formatCurrency(results.recordingFees)}</span>
               </div>
-              <div className="flex justify-between border-b-2 border-slate-300 pb-2 pt-2">
-                <span className="text-base font-semibold text-slate-900">Total Exchange Costs:</span>
-                <span className="text-base font-bold text-[#1E3A8A]">{formatCurrency(results.totalCosts)}</span>
+              <div className="flex justify-between border-b-2 border-white/30 pb-3 pt-2">
+                <span className="font-heading text-lg uppercase text-white">Total Costs:</span>
+                <span className="font-heading text-lg text-white">{formatCurrency(results.totalCosts)}</span>
               </div>
-            </div>
-            <div className="mt-4 rounded-md bg-blue-50 p-4">
-              <p className="text-xs text-slate-700">
-                <strong>Note:</strong> These are estimated costs. Actual fees may vary based on your qualified intermediary, title company, and county requirements. Oklahoma does not impose a state real estate transfer tax, but recording fees and title insurance premiums still apply. Additional costs may include lender fees, inspection costs, and survey fees.
-              </p>
             </div>
           </div>
         )}
@@ -297,4 +287,3 @@ export default function ExchangeCostEstimator() {
     </div>
   );
 }
-
