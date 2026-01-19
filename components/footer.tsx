@@ -193,34 +193,11 @@ export default function Footer() {
         </div>
         
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-8 md:flex-row">
-          <p className="text-sm text-gray-500">
-            Website Designed and Developed by{" "}
-            <a href="https://luxurypresence.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-900">
-              Luxury Presence
-            </a>
+        <div className="mt-12 border-t border-gray-200 pt-8">
+          <p className="text-center text-sm text-gray-500">
+            &copy; 2026. 1031 Exchange Oklahoma City.
           </p>
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span>Copyright &copy; {new Date().getFullYear()}</span>
-            <span>|</span>
-            <Link href="/privacy" className="hover:text-gray-900">
-              Privacy Policy
-            </Link>
-          </div>
         </div>
-
-        {/* Legal disclaimer */}
-        <p className="mt-8 text-xs leading-relaxed text-gray-400">
-          &copy; {new Date().getFullYear()}. {SITE_NAME}. All material presented herein is intended for 
-          information purposes only. While, this information is believed to be correct, it is represented 
-          subject to errors, omissions, changes or withdrawal without notice. All property information, 
-          including, but not limited to square footage, room count, number of bedrooms and the school 
-          district in property listings are deemed reliable, but should be verified by your own attorney, 
-          architect or zoning expert. The number of bedrooms listed above is not a legal conclusion. 
-          Each person should consult with his/her own attorney, architect or zoning expert to make a 
-          determination as to the number of room in the unit that may be legally used as a bedroom. 
-          Equal Housing Opportunity.
-        </p>
       </div>
     </footer>
   );

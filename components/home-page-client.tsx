@@ -7,7 +7,8 @@ import Script from "next/script";
 import { motion, AnimatePresence } from "framer-motion";
 import { servicesData } from "@/data/services";
 import { locationsData } from "@/data/locations";
-import { PHONE_NUMBER, PHONE_HREF, EMAIL, SITE_NAME, OFFICE_ADDRESS } from "@/lib/config";
+import { propertyTypesData } from "@/data/property-types";
+import { PHONE_NUMBER, PHONE_HREF, EMAIL, SITE_NAME } from "@/lib/config";
 
 // Rolling number component with smooth animation
 function RollingNumber({
@@ -34,7 +35,6 @@ function RollingNumber({
           const animate = () => {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            // Easing function for smooth deceleration
             const easeOut = 1 - Math.pow(1 - progress, 3);
             setCurrent(Math.floor(target * easeOut));
             if (progress < 1) {
@@ -63,40 +63,77 @@ function RollingNumber({
   );
 }
 
-// Carousel component
+// Improved Carousel component that cycles through all items infinitely
 function Carousel({
   children,
   itemsPerView = 3,
+  viewAllHref,
+  viewAllText = "View All",
 }: {
   children: React.ReactNode[];
   itemsPerView?: number;
+  viewAllHref: string;
+  viewAllText?: string;
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const maxIndex = Math.max(0, children.length - itemsPerView);
+  const totalItems = children.length;
+
+  // Calculate proper width percentage based on items per view
+  const itemWidth = 100 / itemsPerView;
 
   const next = useCallback(() => {
-    setCurrentIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
-  }, [maxIndex]);
+    setCurrentIndex((prev) => (prev + 1) % totalItems);
+  }, [totalItems]);
 
   const prev = useCallback(() => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : maxIndex));
-  }, [maxIndex]);
+    setCurrentIndex((prev) => (prev - 1 + totalItems) % totalItems);
+  }, [totalItems]);
+
+  // Create infinite scroll effect by tripling the items
+  const extendedChildren = useMemo(() => {
+    return [...children, ...children, ...children];
+  }, [children]);
 
   return (
     <div className="relative">
       <div className="overflow-hidden">
         <motion.div
-          className="flex gap-6"
-          animate={{ x: `-${currentIndex * (100 / itemsPerView + 2)}%` }}
+          className="flex"
+          style={{ gap: "1.5rem" }}
+          animate={{ 
+            x: `calc(-${(currentIndex + totalItems) * itemWidth}% - ${(currentIndex + totalItems) * 1.5}rem)` 
+          }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
-          {children}
+          {extendedChildren.map((child, index) => (
+            <div
+              key={index}
+              className="flex-shrink-0"
+              style={{ width: `calc(${itemWidth}% - 1rem)` }}
+            >
+              {child}
+            </div>
+          ))}
         </motion.div>
       </div>
+      
+      {/* Controls */}
       <div className="mt-8 flex items-center justify-between">
-        <Link href="/services" className="btn-outline">
-          View All
+        <Link href={viewAllHref} className="btn-primary">
+          {viewAllText}
         </Link>
+        
+        {/* Progress line */}
+        <div className="hidden flex-1 mx-8 md:block">
+          <div className="h-px bg-gray-700 relative">
+            <motion.div 
+              className="absolute top-0 left-0 h-px bg-white"
+              style={{ width: `${((currentIndex % totalItems) + 1) / totalItems * 100}%` }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+        </div>
+        
         <div className="carousel-nav">
           <button onClick={prev} aria-label="Previous">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -151,17 +188,10 @@ const benefits = [
 // Stats data
 const stats = [
   { value: 4, prefix: "$", suffix: "B+", label: "Total Exchanges Facilitated" },
-  { value: 413, prefix: "$", suffix: "M+", label: "2024 Exchange Volume" },
-  { value: 21, prefix: "$", suffix: "M+", label: "Avg. Exchange Value" },
+  { value: 413, prefix: "$", suffix: "M+", label: "2025 Exchange Volume" },
   { value: 45, suffix: "+", label: "Years Combined Experience" },
   { value: 1, prefix: "#", suffix: "", label: "Oklahoma QI Partner" },
 ];
-
-// Services for carousel
-const featuredServices = servicesData.slice(0, 6);
-
-// Locations for carousel
-const featuredLocations = locationsData.slice(0, 6);
 
 // Resources/Press items
 const resources = [
@@ -238,7 +268,6 @@ export default function HomePageClient() {
 
       {/* Hero Section with Video Background */}
       <section className="relative h-screen min-h-[600px] overflow-hidden">
-        {/* Video Background */}
         <video
           autoPlay
           muted
@@ -250,10 +279,8 @@ export default function HomePageClient() {
           <source src="/lame bum fuck ofc .mp4" type="video/mp4" />
         </video>
         
-        {/* Overlay */}
         <div className="hero-overlay absolute inset-0" />
         
-        {/* Content */}
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center text-white">
             <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -271,7 +298,6 @@ export default function HomePageClient() {
             </motion.div>
         </div>
 
-        {/* Scroll indicator */}
             <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
           initial={{ opacity: 0 }}
@@ -289,11 +315,10 @@ export default function HomePageClient() {
         </motion.div>
       </section>
 
-      {/* Meet the Team / About Section */}
+      {/* Meet the Team Section */}
       <section className="bg-white py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-            {/* Image */}
             <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -310,7 +335,6 @@ export default function HomePageClient() {
               />
             </motion.div>
 
-            {/* Content */}
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -345,7 +369,7 @@ export default function HomePageClient() {
       <section className="bg-white py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <h2 className="font-heading text-center text-4xl uppercase md:text-5xl">Our Stats</h2>
-          <div className="mt-12 grid grid-cols-2 gap-8 md:grid-cols-5 md:gap-4">
+          <div className="mt-12 flex flex-wrap justify-center gap-8 md:gap-12">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -377,16 +401,16 @@ export default function HomePageClient() {
             Featured Services
               </h2>
           <div className="mt-12">
-            <Carousel itemsPerView={3}>
-              {featuredServices.map((service) => (
+            <Carousel itemsPerView={3} viewAllHref="/services" viewAllText="View All">
+              {servicesData.map((service) => (
                 <Link
                   key={service.slug}
                   href={service.route}
-                  className="group relative min-w-[calc(33.333%-1rem)] flex-shrink-0"
+                  className="group block"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-gray-800">
                     <Image
-                      src={`/locations/oklahoma-city-ok-1031-exchange.jpg`}
+                      src="/locations/oklahoma-city-ok-1031-exchange.jpg"
                       alt={service.name}
                       fill
                       className="object-cover opacity-70 transition-transform duration-500 group-hover:scale-105"
@@ -399,7 +423,7 @@ export default function HomePageClient() {
                       </div>
                   <div className="mt-4">
                     <h3 className="font-heading text-xl uppercase">{service.name}</h3>
-                    <p className="mt-2 text-sm text-gray-400">{service.short}</p>
+                    <p className="mt-2 text-sm text-gray-400 line-clamp-2">{service.short}</p>
                     </div>
                 </Link>
               ))}
@@ -408,9 +432,8 @@ export default function HomePageClient() {
             </div>
       </section>
 
-      {/* Benefits Section (Testimonials replacement) */}
+      {/* Benefits Section */}
       <section className="relative overflow-hidden py-20 md:py-28">
-        {/* Background Image */}
         <div className="absolute inset-0">
           <Image
             src="/locations/tulsa-ok-1031-exchange.jpg"
@@ -424,7 +447,6 @@ export default function HomePageClient() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-6 md:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2">
-            {/* Left side */}
               <div>
               <h2 className="font-heading text-4xl uppercase text-white md:text-5xl">
                 See Why 1031
@@ -434,9 +456,8 @@ export default function HomePageClient() {
               <Link href="/services" className="btn-outline mt-8 border-white text-white hover:bg-white hover:text-gray-900">
                 View All
               </Link>
-            </div>
+              </div>
 
-            {/* Right side - rotating benefits */}
             <div className="relative min-h-[280px]">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -457,7 +478,6 @@ export default function HomePageClient() {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Navigation */}
               <div className="mt-8 flex justify-end">
                 <div className="carousel-nav">
                   <button onClick={prevBenefit} aria-label="Previous benefit">
@@ -470,29 +490,29 @@ export default function HomePageClient() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
-              </div>
             </div>
           </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Service Areas Section (Dark) */}
+      {/* Neighborhoods Section (Dark) */}
       <section className="section-dark py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <h2 className="font-heading text-center text-4xl uppercase md:text-5xl">
-            Service Areas
+            Neighborhoods
                 </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center text-gray-400">
-            Browse our service area guides below to learn more about each market.
-          </p>
+            Browse our neighborhood guides below to learn more about each area.
+                </p>
           <div className="mt-12">
-            <Carousel itemsPerView={3}>
-              {featuredLocations.map((location) => (
+            <Carousel itemsPerView={3} viewAllHref="/service-areas" viewAllText="View All">
+              {locationsData.map((location) => (
               <Link
                   key={location.slug}
                   href={location.route}
-                  className="group relative min-w-[calc(33.333%-1rem)] flex-shrink-0"
+                  className="group block"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-gray-800">
                     <Image
@@ -503,9 +523,6 @@ export default function HomePageClient() {
                       sizes="(max-width: 768px) 100vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                      <span className="btn-white">View More</span>
-            </div>
                   </div>
                   <div className="mt-4">
                     <h3 className="font-heading text-xl uppercase">{location.name}</h3>
@@ -513,24 +530,80 @@ export default function HomePageClient() {
                       1031 exchange services for {location.name} area investors.
                     </p>
                   </div>
-                </Link>
+              </Link>
               ))}
             </Carousel>
+            </div>
+          </div>
+      </section>
+
+      {/* Property Types Section (Light) */}
+      <section className="bg-white py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-center text-4xl uppercase md:text-5xl">
+            Property Types
+                </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-gray-600">
+            Explore available property types for 1031 exchange replacement.
+          </p>
+          <div className="mt-12">
+            <div className="relative">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {propertyTypesData.slice(0, 6).map((propertyType) => (
+              <Link
+                    key={propertyType.slug}
+                    href={propertyType.route}
+                    className="group block"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                      {propertyType.heroImage ? (
+                        <Image
+                          src={propertyType.heroImage}
+                          alt={propertyType.name}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center bg-gray-200">
+                          <span className="font-heading text-xl text-gray-400">{propertyType.name}</span>
+            </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <span className="absolute bottom-4 right-4 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gray-900">
+                        Property Type
+                      </span>
+                    </div>
+                    <div className="mt-4">
+                      <h3 className="font-heading text-xl uppercase text-gray-900">{propertyType.name}</h3>
+                      <p className="mt-2 text-sm text-gray-600">
+                        Available nationwide for 1031 exchange.
+                      </p>
+                    </div>
+                </Link>
+                ))}
+              </div>
+              <div className="mt-8 text-center">
+                <Link href="/inventory" className="btn-outline">
+                  View All Property Types
+                </Link>
+            </div>
+          </div>
           </div>
         </div>
       </section>
 
-      {/* Resources Section (Light) */}
-      <section className="bg-white py-20 md:py-28">
+      {/* Resources Section */}
+      <section className="bg-gray-50 py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <h2 className="font-heading text-center text-4xl uppercase md:text-5xl">
             Industry Resources
-          </h2>
+                </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center text-gray-600">
             Stay informed with the latest guidance and market insights for 1031 exchanges.
           </p>
 
-          <div className="mt-12 divide-y divide-gray-200 border-y border-gray-200">
+          <div className="mt-12 divide-y divide-gray-200 border-y border-gray-200 bg-white">
             {resources.map((resource, index) => (
               <motion.a
                 key={resource.title}
@@ -541,7 +614,7 @@ export default function HomePageClient() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group flex items-center gap-6 py-8 transition-colors hover:bg-gray-50"
+                className="group flex items-center gap-6 p-6 transition-colors hover:bg-gray-50"
               >
                 <div className="hidden h-20 w-28 flex-shrink-0 overflow-hidden bg-gray-100 md:block">
                   <Image
@@ -571,19 +644,18 @@ export default function HomePageClient() {
                 </svg>
               </motion.a>
             ))}
-          </div>
+                      </div>
 
           <div className="mt-8 text-center">
             <Link href="/blog" className="btn-outline">
-              View All
+              View All Resources
             </Link>
-              </div>
+                  </div>
             </div>
       </section>
 
       {/* Work With Us CTA Section */}
       <section className="relative overflow-hidden py-28 md:py-36">
-        {/* Background Image */}
         <div className="absolute inset-0">
           <Image
             src="/locations/edmond-ok-1031-exchange.jpg"
@@ -595,7 +667,6 @@ export default function HomePageClient() {
           <div className="absolute inset-0 bg-black/50" />
           </div>
 
-        {/* Decorative line */}
         <div className="absolute left-1/2 top-12 h-16 w-px -translate-x-1/2 bg-white/30" />
 
         <div className="relative z-10 mx-auto max-w-3xl px-6 text-center text-white md:px-8">
@@ -607,7 +678,7 @@ export default function HomePageClient() {
           >
             <h2 className="font-heading text-4xl uppercase md:text-5xl lg:text-6xl">
               Work With Us
-              </h2>
+            </h2>
             <p className="mt-6 text-lg leading-relaxed text-white/90">
               Our team approaches Oklahoma&apos;s real estate landscape with an auspicious blend of 
               experience, deep community ties and forward thinking. Contact us today to get 
@@ -617,11 +688,11 @@ export default function HomePageClient() {
               Contact Us
             </Link>
           </motion.div>
-            </div>
+        </div>
       </section>
 
       {/* Let's Connect Floating Button */}
-                    <button
+      <button
         onClick={() => setContactOpen(!contactOpen)}
         className="connect-btn"
         aria-label="Open contact options"
@@ -635,7 +706,7 @@ export default function HomePageClient() {
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
         </svg>
-                    </button>
+      </button>
 
       {/* Contact Popup */}
       <AnimatePresence>
