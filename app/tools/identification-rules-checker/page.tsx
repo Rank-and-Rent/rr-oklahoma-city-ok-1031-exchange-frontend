@@ -129,7 +129,7 @@ export default function IdentificationRulesCheckerPage() {
 
             <div className="rounded-xl border-2 border-green-200 bg-green-50 p-8">
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-600 text-lg font-bold text-white">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white">
                   200%
                 </div>
                 <div>
