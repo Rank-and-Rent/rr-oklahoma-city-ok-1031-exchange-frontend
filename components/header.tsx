@@ -5,15 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { servicesData } from "@/data/services";
 import { locationsData } from "@/data/locations";
-import { propertyTypesData } from "@/data/property-types";
-import { PHONE_NUMBER, PHONE_HREF, SITE_NAME } from "@/lib/config";
-import Image from "next/image";
-import {
-  ChevronDownIcon,
-  ArrowUpRightIcon,
-  Bars3Icon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { SITE_NAME } from "@/lib/config";
 
 const tools = [
   { name: "Boot Calculator", href: "/tools/boot-calculator" },
@@ -23,442 +15,131 @@ const tools = [
 
 export default function Header() {
   const pathname = usePathname();
-  const [servicesOpen, setServicesOpen] = useState(false);
-  const [locationsOpen, setLocationsOpen] = useState(false);
-  const [toolsOpen, setToolsOpen] = useState(false);
-  const [inventoryOpen, setInventoryOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const servicesRef = useRef<HTMLDivElement>(null);
-  const locationsRef = useRef<HTMLDivElement>(null);
-  const toolsRef = useRef<HTMLDivElement>(null);
-  const inventoryRef = useRef<HTMLDivElement>(null);
-  const servicesTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const locationsTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const toolsTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const inventoryTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const [scrolled, setScrolled] = useState(false);
+  const isHomePage = pathname === "/";
 
-  // Close dropdowns when clicking outside
+  // Handle scroll for transparent header on home page
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (servicesRef.current && !servicesRef.current.contains(event.target as Node)) {
-        setServicesOpen(false);
-      }
-      if (locationsRef.current && !locationsRef.current.contains(event.target as Node)) {
-        setLocationsOpen(false);
-      }
-      if (toolsRef.current && !toolsRef.current.contains(event.target as Node)) {
-        setToolsOpen(false);
-      }
-      if (inventoryRef.current && !inventoryRef.current.contains(event.target as Node)) {
-        setInventoryOpen(false);
-      }
-    }
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdowns on Escape key
+  // Close mobile menu on escape
   useEffect(() => {
-    function handleEscape(event: KeyboardEvent) {
+    const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setServicesOpen(false);
-        setLocationsOpen(false);
-        setToolsOpen(false);
-        setInventoryOpen(false);
         setMobileMenuOpen(false);
       }
-    }
+    };
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
-  // Handle hover for desktop
-  const handleServicesMouseEnter = () => {
-    if (servicesTimeoutRef.current) {
-      clearTimeout(servicesTimeoutRef.current);
-    }
-    setServicesOpen(true);
-  };
-
-  const handleServicesMouseLeave = () => {
-    servicesTimeoutRef.current = setTimeout(() => {
-      setServicesOpen(false);
-    }, 500);
-  };
-
-  const handleLocationsMouseEnter = () => {
-    if (locationsTimeoutRef.current) {
-      clearTimeout(locationsTimeoutRef.current);
-    }
-    setLocationsOpen(true);
-  };
-
-  const handleLocationsMouseLeave = () => {
-    locationsTimeoutRef.current = setTimeout(() => {
-      setLocationsOpen(false);
-    }, 500);
-  };
-
-  const handleToolsMouseEnter = () => {
-    if (toolsTimeoutRef.current) {
-      clearTimeout(toolsTimeoutRef.current);
-    }
-    setToolsOpen(true);
-  };
-
-  const handleToolsMouseLeave = () => {
-    toolsTimeoutRef.current = setTimeout(() => {
-      setToolsOpen(false);
-    }, 200);
-  };
-
-  const handleInventoryMouseEnter = () => {
-    if (inventoryTimeoutRef.current) {
-      clearTimeout(inventoryTimeoutRef.current);
-    }
-    setInventoryOpen(true);
-  };
-
-  const handleInventoryMouseLeave = () => {
-    inventoryTimeoutRef.current = setTimeout(() => {
-      setInventoryOpen(false);
-    }, 500);
-  };
-
-  // Handle keyboard navigation
-  const handleServicesKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setServicesOpen(!servicesOpen);
-      setLocationsOpen(false);
-      setToolsOpen(false);
-    }
-  };
-
-  const handleLocationsKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setLocationsOpen(!locationsOpen);
-      setServicesOpen(false);
-      setToolsOpen(false);
-    }
-  };
-
-  const handleToolsKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setToolsOpen(!toolsOpen);
-      setServicesOpen(false);
-      setLocationsOpen(false);
-      setInventoryOpen(false);
-    }
-  };
-
-  const handleInventoryKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setInventoryOpen(!inventoryOpen);
-      setServicesOpen(false);
-      setLocationsOpen(false);
-      setToolsOpen(false);
-    }
-  };
-
-  // Get top 6-8 services for dropdown, grouped by category
-  const topServices = servicesData.slice(0, 8);
-  const servicesByCategory: Record<string, typeof topServices> = {};
+  // Determine header style based on scroll and page
+  const headerBg = isHomePage && !scrolled
+    ? "bg-transparent"
+    : "bg-white/95 backdrop-blur border-b border-gray-100";
   
-  topServices.forEach((service) => {
-    const category = service.category || "other";
-    if (!servicesByCategory[category]) {
-      servicesByCategory[category] = [];
-    }
-    servicesByCategory[category].push(service);
-  });
+  const textColor = isHomePage && !scrolled
+    ? "text-white"
+    : "text-gray-900";
 
-  const categoryLabels: Record<string, string> = {
-    "Timelines": "Timelines",
-    "Structures": "Structures",
-    "Execution": "Execution",
-    "Tax": "Tax",
-    "Reporting": "Reporting",
-    "Property Paths": "Property Paths",
-    "Education": "Education",
-    "other": "Other",
-  };
-
-  // Get locations with Oklahoma City first, then top 6-7 others
-  const primaryLocation = locationsData.find((l) => l.slug === "oklahoma-city-ok");
-  const otherLocations = locationsData.filter((l) => l.slug !== "oklahoma-city-ok").slice(0, 7);
-  const topLocations = primaryLocation ? [primaryLocation, ...otherLocations] : otherLocations;
+  const logoColor = isHomePage && !scrolled
+    ? "text-white"
+    : "text-gray-900";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
+    <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerBg}`}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-8">
+        {/* Logo */}
         <Link href="/" className="flex items-center">
-          <Image
-            src="/1031-exchange-oklahoma-city-ok.png"
-            alt={`${SITE_NAME} Logo`}
-            width={2640}
-            height={602}
-            className="h-12 w-auto md:h-14"
-            priority
-          />
+          <div className={`font-heading text-lg tracking-wider ${logoColor} md:text-xl`}>
+            <span className="font-heading">1031 EXCHANGE OKC</span>
+            <span className={`mt-0.5 block text-[10px] font-normal tracking-[0.2em] ${isHomePage && !scrolled ? "text-white/70" : "text-gray-500"}`}>
+              Oklahoma City Qualified Intermediary
+            </span>
+          </div>
         </Link>
         
-        <nav className="hidden items-center gap-8 text-sm font-medium text-slate-700 md:flex">
-          <div
-            ref={servicesRef}
-            className="relative"
-            onMouseEnter={handleServicesMouseEnter}
-            onMouseLeave={handleServicesMouseLeave}
+        {/* Desktop Navigation */}
+        <nav className={`hidden items-center gap-8 text-sm font-medium ${textColor} lg:flex`}>
+          <Link 
+            className="transition-opacity hover:opacity-70" 
+            href="/services"
           >
-            <button
-              type="button"
-              className="flex items-center gap-1 transition hover:text-slate-900"
-              aria-expanded={servicesOpen}
-              aria-haspopup="true"
-              onKeyDown={handleServicesKeyDown}
-              onClick={() => setServicesOpen(!servicesOpen)}
-            >
-              Services
-              <ChevronDownIcon className={`h-4 w-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
-            </button>
-            {servicesOpen && (
-              <div 
-                className="absolute left-0 top-full mt-2 w-[600px] rounded-2xl border border-slate-200 bg-white shadow-xl"
-                onMouseEnter={handleServicesMouseEnter}
-                onMouseLeave={handleServicesMouseLeave}
-              >
-                <div className="grid grid-cols-2 gap-6 p-6">
-                  {Object.entries(servicesByCategory).map(([category, categoryServices]) => (
-                    <div key={category}>
-                      <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">
-                        {categoryLabels[category] || category}
-                      </h3>
-                      <ul className="space-y-2">
-                        {categoryServices.map((service) => (
-                          <li key={service.slug}>
-                            <Link
-                              href={service.route}
-                              className="block text-sm text-slate-700 transition hover:text-[#1E3A8A]"
-                              onClick={() => setServicesOpen(false)}
-                            >
-                              {service.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-                <div className="border-t border-slate-200 p-4">
-                  <Link
-                    href="/services"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#1E3A8A] transition hover:text-[#162d63]"
-                    onClick={() => setServicesOpen(false)}
-                  >
-                    View All {servicesData.length} Services <ArrowUpRightIcon className="h-4 w-4" />
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div
-            ref={locationsRef}
-            className="relative"
-            onMouseEnter={handleLocationsMouseEnter}
-            onMouseLeave={handleLocationsMouseLeave}
+            Services
+          </Link>
+          <Link 
+            className="transition-opacity hover:opacity-70" 
+            href="/service-areas"
           >
-            <button
-              type="button"
-              className="flex items-center gap-1 transition hover:text-slate-900"
-              aria-expanded={locationsOpen}
-              aria-haspopup="true"
-              onKeyDown={handleLocationsKeyDown}
-              onClick={() => setLocationsOpen(!locationsOpen)}
-            >
-              Locations
-              <ChevronDownIcon className={`h-4 w-4 transition-transform ${locationsOpen ? "rotate-180" : ""}`} />
-            </button>
-            {locationsOpen && (
-              <div 
-                className="absolute left-0 top-full mt-2 w-[400px] rounded-2xl border border-slate-200 bg-white shadow-xl"
-                onMouseEnter={handleLocationsMouseEnter}
-                onMouseLeave={handleLocationsMouseLeave}
-              >
-                <div className="p-6">
-                  <ul className="grid grid-cols-2 gap-3">
-                    {topLocations.map((location) => (
-                      <li key={location.slug}>
-                        <Link
-                          href={location.route}
-                          className="block text-sm text-slate-700 transition hover:text-[#1E3A8A]"
-                          onClick={() => setLocationsOpen(false)}
-                        >
-                          {location.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="border-t border-slate-200 p-4">
-                  <Link
-                    href="/service-areas"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#1E3A8A] transition hover:text-[#162d63]"
-                    onClick={() => setLocationsOpen(false)}
-                  >
-                    View All {locationsData.length} Service Areas <ArrowUpRightIcon className="h-4 w-4" />
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div
-            ref={toolsRef}
-            className="relative"
-            onMouseEnter={handleToolsMouseEnter}
-            onMouseLeave={handleToolsMouseLeave}
+            Service Areas
+          </Link>
+          <Link 
+            className="transition-opacity hover:opacity-70" 
+            href="/tools"
           >
-            <button
-              type="button"
-              className="flex items-center gap-1 transition hover:text-slate-900"
-              aria-expanded={toolsOpen}
-              aria-haspopup="true"
-              onKeyDown={handleToolsKeyDown}
-              onClick={() => setToolsOpen(!toolsOpen)}
-            >
-              Tools
-              <ChevronDownIcon className={`h-4 w-4 transition-transform ${toolsOpen ? "rotate-180" : ""}`} />
-            </button>
-            {toolsOpen && (
-              <div className="absolute left-0 top-full mt-2 w-[300px] rounded-2xl border border-slate-200 bg-white shadow-xl">
-                <div className="p-6">
-                  <ul className="space-y-2">
-                    {tools.map((tool) => (
-                      <li key={tool.href}>
-                        <Link
-                          href={tool.href}
-                          className="block text-sm text-slate-700 transition hover:text-[#1E3A8A]"
-                          onClick={() => setToolsOpen(false)}
-                        >
-                          {tool.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="border-t border-slate-200 p-4">
-                  <Link
-                    href="/tools"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#1E3A8A] transition hover:text-[#162d63]"
-                    onClick={() => setToolsOpen(false)}
-                  >
-                    View All Tools <ArrowUpRightIcon className="h-4 w-4" />
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div
-            ref={inventoryRef}
-            className="relative"
-            onMouseEnter={handleInventoryMouseEnter}
-            onMouseLeave={handleInventoryMouseLeave}
+            Tools
+          </Link>
+          <Link 
+            className="transition-opacity hover:opacity-70" 
+            href="/inventory"
           >
-            <button
-              type="button"
-              className="flex items-center gap-1 transition hover:text-slate-900"
-              aria-expanded={inventoryOpen}
-              aria-haspopup="true"
-              onKeyDown={handleInventoryKeyDown}
-              onClick={() => setInventoryOpen(!inventoryOpen)}
-            >
-              Inventory
-              <ChevronDownIcon className={`h-4 w-4 transition-transform ${inventoryOpen ? "rotate-180" : ""}`} />
-            </button>
-            {inventoryOpen && (
-              <div 
-                className="absolute left-0 top-full mt-2 w-[600px] rounded-2xl border border-slate-200 bg-white shadow-xl"
-                onMouseEnter={handleInventoryMouseEnter}
-                onMouseLeave={handleInventoryMouseLeave}
-              >
-                <div className="grid grid-cols-3 gap-4 p-6">
-                  {propertyTypesData.map((item) => {
-                    const heroImageSrc = item.heroImage || `/inventory/${item.slug}-oklahoma-1031-exchange.jpg`;
-                    const heroImageAlt = `${item.name} property type`;
-                    return (
-                      <Link
-                        key={item.slug}
-                        href={item.route}
-                        className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-[#1E3A8A]"
-                        onClick={() => setInventoryOpen(false)}
-                      >
-                        {item.heroImage && (
-                          <div className="relative h-24 w-full">
-                            <Image
-                              src={heroImageSrc}
-                              alt={heroImageAlt}
-                              fill
-                              className="object-cover transition group-hover:scale-105"
-                              sizes="(max-width: 768px) 33vw, 200px"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                          </div>
-                        )}
-                        <div className={`${item.heroImage ? 'absolute bottom-0 left-0 right-0 p-3' : 'p-3'}`}>
-                          <h3 className={`text-xs font-semibold ${item.heroImage ? 'text-white' : 'text-slate-900 group-hover:text-[#1E3A8A]'}`}>
-                            {item.name}
-                          </h3>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-                <div className="border-t border-slate-200 p-4">
-                  <Link
-                    href="/inventory"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#1E3A8A] transition hover:text-[#162d63]"
-                    onClick={() => setInventoryOpen(false)}
-                  >
-                    View All {propertyTypesData.length} Property Types <ArrowUpRightIcon className="h-4 w-4" />
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <Link className="transition hover:text-slate-900" href="/blog">
+            Inventory
+          </Link>
+          <Link 
+            className="transition-opacity hover:opacity-70" 
+            href="/blog"
+          >
             Blog
           </Link>
-          <Link className="transition hover:text-slate-900" href="/about">
-            About
+          <Link 
+            className="transition-opacity hover:opacity-70" 
+            href="/contact"
+          >
+            Contact Us
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/contact"
-            className="hidden rounded-full bg-[#1E3A8A] px-5 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#162d63] md:inline-flex"
-          >
-            Contact
-          </Link>
+        {/* Menu dots / hamburger */}
+        <div className="flex items-center gap-4">
+          {/* Desktop menu dots (decorative) */}
           <button
             type="button"
-            className="inline-flex rounded-lg p-2 text-slate-700 transition hover:bg-slate-100 md:hidden"
+            className={`hidden p-2 lg:block ${textColor}`}
+            aria-label="More options"
+          >
+            <div className="grid grid-cols-2 gap-1">
+              <span className={`h-1 w-1 rounded-full ${isHomePage && !scrolled ? "bg-white" : "bg-gray-900"}`} />
+              <span className={`h-1 w-1 rounded-full ${isHomePage && !scrolled ? "bg-white" : "bg-gray-900"}`} />
+              <span className={`h-1 w-1 rounded-full ${isHomePage && !scrolled ? "bg-white" : "bg-gray-900"}`} />
+              <span className={`h-1 w-1 rounded-full ${isHomePage && !scrolled ? "bg-white" : "bg-gray-900"}`} />
+            </div>
+          </button>
+
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            className={`p-2 lg:hidden ${textColor}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle mobile menu"
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
-              <XMarkIcon className="h-6 w-6" />
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             ) : (
-              <Bars3Icon className="h-6 w-6" />
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             )}
           </button>
         </div>
@@ -466,69 +147,75 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-slate-200 bg-white md:hidden">
-          <nav className="mx-auto max-w-7xl px-6 py-4">
-            <div className="space-y-4">
+        <div className="border-t border-gray-100 bg-white lg:hidden">
+          <nav className="mx-auto max-w-7xl px-6 py-6">
+            <div className="space-y-6">
               <div>
-                <Link
-                  href="/services"
-                  className="block py-2 text-sm font-semibold text-slate-900"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Services ({servicesData.length})
-                </Link>
-                <ul className="ml-4 mt-2 space-y-2">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Services
+                </h3>
+                <ul className="space-y-2">
                   {servicesData.slice(0, 6).map((service) => (
                     <li key={service.slug}>
                       <Link
                         href={service.route}
-                        className="block py-1 text-sm text-slate-600"
+                        className="block text-sm text-gray-700 transition-colors hover:text-gray-900"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {service.name}
                       </Link>
                     </li>
                   ))}
+                  <li>
+                    <Link
+                      href="/services"
+                      className="block text-sm font-semibold text-gray-900"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      View All Services
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
               <div>
-                <Link
-                  href="/service-areas"
-                  className="block py-2 text-sm font-semibold text-slate-900"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Locations ({locationsData.length})
-                </Link>
-                <ul className="ml-4 mt-2 space-y-2">
-                  {topLocations.slice(0, 6).map((location) => (
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Service Areas
+                </h3>
+                <ul className="space-y-2">
+                  {locationsData.slice(0, 6).map((location) => (
                     <li key={location.slug}>
                       <Link
                         href={location.route}
-                        className="block py-1 text-sm text-slate-600"
+                        className="block text-sm text-gray-700 transition-colors hover:text-gray-900"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {location.name}
                       </Link>
                     </li>
                   ))}
+                  <li>
+                    <Link
+                      href="/service-areas"
+                      className="block text-sm font-semibold text-gray-900"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      View All Service Areas
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
               <div>
-                <Link
-                  href="/tools"
-                  className="block py-2 text-sm font-semibold text-slate-900"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
                   Tools
-                </Link>
-                <ul className="ml-4 mt-2 space-y-2">
+                </h3>
+                <ul className="space-y-2">
                   {tools.map((tool) => (
                     <li key={tool.href}>
                       <Link
                         href={tool.href}
-                        className="block py-1 text-sm text-slate-600"
+                        className="block text-sm text-gray-700 transition-colors hover:text-gray-900"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {tool.name}
@@ -538,47 +225,39 @@ export default function Header() {
                 </ul>
               </div>
 
-              <div>
-                <Link
-                  href="/inventory"
-                  className="block py-2 text-sm font-semibold text-slate-900"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Inventory ({propertyTypesData.length})
-                </Link>
-                <ul className="ml-4 mt-2 space-y-2">
-                  {propertyTypesData.slice(0, 6).map((item) => (
-                    <li key={item.slug}>
-                      <Link
-                        href={item.route}
-                        className="block py-1 text-sm text-slate-600"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
+              <div className="border-t border-gray-100 pt-6">
+                <ul className="space-y-2">
+                  <li>
+                    <Link
+                      href="/inventory"
+                      className="block text-sm font-medium text-gray-900"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Inventory
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/blog"
+                      className="block text-sm font-medium text-gray-900"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Blog
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/about"
+                      className="block text-sm font-medium text-gray-900"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      About
+                    </Link>
+                  </li>
                 </ul>
-              </div>
-
-              <div className="border-t border-slate-200 pt-4">
-                <Link
-                  href="/blog"
-                  className="block py-2 text-sm font-medium text-slate-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Blog
-                </Link>
-                <Link
-                  href="/about"
-                  className="block py-2 text-sm font-medium text-slate-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  About
-                </Link>
                 <Link
                   href="/contact"
-                  className="mt-4 block rounded-full bg-[#1E3A8A] px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#162d63]"
+                  className="btn-primary mt-6 w-full"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Contact Us
@@ -591,4 +270,3 @@ export default function Header() {
     </header>
   );
 }
-

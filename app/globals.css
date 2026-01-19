@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
+  --color-dark: #1a1a1a;
+  --color-dark-lighter: #2a2a2a;
+  --color-cream: #f5f5f0;
+  --color-gold: #c9a962;
 }
 
 html,
@@ -12,15 +16,15 @@ body {
 }
 
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #ffffff;
+  color: #1a1a1a;
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
 }
 
 .container {
   width: 100%;
-  max-width: 72rem;
+  max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -35,6 +39,203 @@ body {
 }
 
 :where(a, button, [role="button"], input, select, textarea):focus-visible {
-  outline: 2px solid #1e3a8a;
+  outline: 2px solid var(--color-gold);
   outline-offset: 2px;
+}
+
+/* Heading font class */
+.font-heading {
+  font-family: var(--font-bebas), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* Body font class */
+.font-body {
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Hero video overlay */
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+}
+
+/* Rolling number animation */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-count {
+  animation: countUp 0.6s ease-out forwards;
+}
+
+/* Carousel slide animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+/* Benefit rotation fade */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Dark section styling */
+.section-dark {
+  background-color: var(--color-dark);
+  color: #ffffff;
+}
+
+.section-dark-lighter {
+  background-color: var(--color-dark-lighter);
+  color: #ffffff;
+}
+
+/* Button styles matching screenshot */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background-color: var(--color-dark);
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #333333;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background-color: transparent;
+  color: var(--color-dark);
+  border: 1px solid var(--color-dark);
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background-color: var(--color-dark);
+  color: #ffffff;
+}
+
+.btn-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background-color: #ffffff;
+  color: var(--color-dark);
+  transition: all 0.2s ease;
+}
+
+.btn-white:hover {
+  background-color: #f0f0f0;
+}
+
+/* Carousel navigation */
+.carousel-nav {
+  display: flex;
+  background-color: #ffffff;
+}
+
+.carousel-nav button {
+  padding: 1rem 1.5rem;
+  color: var(--color-dark);
+  transition: background-color 0.2s ease;
+}
+
+.carousel-nav button:hover {
+  background-color: #f5f5f5;
+}
+
+.carousel-nav button:first-child {
+  border-right: 1px solid #e5e5e5;
+}
+
+/* Newsletter input */
+.newsletter-input {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.newsletter-input:focus {
+  outline: none;
+  border-color: var(--color-dark);
+}
+
+/* Let's Connect button */
+.connect-btn {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #fffef5;
+  border-radius: 9999px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-dark);
+  transition: all 0.2s ease;
+}
+
+.connect-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
 }

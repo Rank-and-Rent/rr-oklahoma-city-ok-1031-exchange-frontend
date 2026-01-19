@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
-import { DM_Serif_Display, Inter } from "next/font/google";
+import { Bebas_Neue, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import StickyCTA from "@/components/sticky-cta";
 import { SITE_NAME, SITE_URL } from "@/lib/config";
 
-const dmSerif = DM_Serif_Display({
+const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
   weight: ["400"],
-  variable: "--font-dm-serif",
+  variable: "--font-bebas",
 });
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-inter",
 });
 
@@ -64,11 +63,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${dmSerif.variable} antialiased`}>
+      <body className={`${inter.variable} ${bebasNeue.variable} font-body antialiased`}>
         <Header />
         <main>{children}</main>
         <Footer />
-        <StickyCTA />
         <Analytics />
       </body>
     </html>
