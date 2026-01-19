@@ -126,7 +126,7 @@ export default function Footer() {
                 </ul>
               </div>
               <div>
-                <h4 className="mb-2 text-xs font-semibold text-gray-900">Service Areas</h4>
+                <h4 className="mb-2 text-xs font-semibold text-gray-900">Neighborhoods</h4>
                 <ul className="space-y-1 text-sm text-gray-600">
                   {locationsData.slice(0, 4).map((location) => (
                 <li key={location.slug}>

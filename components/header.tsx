@@ -80,7 +80,7 @@ export default function Header() {
             className="transition-opacity hover:opacity-70" 
             href="/service-areas"
           >
-            Service Areas
+            Neighborhoods
           </Link>
           <Link 
             className="transition-opacity hover:opacity-70" 
@@ -180,7 +180,7 @@ export default function Header() {
 
               <div>
                 <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                  Service Areas
+                  Neighborhoods
                 </h3>
                 <ul className="space-y-2">
                   {locationsData.slice(0, 6).map((location) => (
@@ -200,7 +200,7 @@ export default function Header() {
                       className="block text-sm font-semibold text-gray-900"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      View All Service Areas
+                      View All Neighborhoods
                     </Link>
                   </li>
                 </ul>

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { SITE_NAME, SITE_URL, PHONE_HREF, PHONE_NUMBER } from "@/lib/config";
+import { SITE_URL } from "@/lib/config";
 import { propertyTypesData } from "@/data/property-types";
-import { ArrowUpRightIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
 export const metadata: Metadata = {
   title: "1031 Exchange Inventory | Available Property Types",
@@ -15,78 +14,222 @@ export const metadata: Metadata = {
 
 export default function InventoryPage() {
   return (
-    <div className="bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-20 md:px-8 md:py-28">
-        <div className="mb-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#1E3A8A]">Inventory</p>
-          <h1 className="mt-3 text-4xl font-semibold text-slate-900 md:text-5xl">
-            Available Property Types for 1031 Exchange
+    <div>
+      {/* Hero Section */}
+      <section className="relative h-[60vh] min-h-[500px] overflow-hidden">
+        <Image
+          src="/locations/broken-arrow-ok-1031-exchange.jpg"
+          alt="Investment property"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-black/40" />
+        
+        <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center text-white">
+          <h1 className="font-heading text-5xl uppercase tracking-wide md:text-6xl lg:text-7xl">
+            Property Inventory
           </h1>
-          <p className="mt-4 text-lg text-slate-600">
-            Explore our inventory of replacement properties available nationwide for 1031 exchange. These properties offer stable cash flow with established tenants and long-term lease commitments.
+          <p className="mt-4 max-w-2xl text-lg text-white/90">
+            Explore available property types for 1031 exchange replacement. Stable cash flow with established tenants nationwide.
           </p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {propertyTypesData.map((item) => {
-            const heroImageSrc = item.heroImage || `/inventory/${item.slug}-oklahoma-1031-exchange.jpg`;
-            const heroImageAlt = `${item.name} property type`;
-            
-            return (
-              <Link
-                key={item.slug}
-                href={item.route}
-                className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg transition hover:-translate-y-1 hover:border-[#1E3A8A]"
-              >
-                {item.heroImage && (
-                  <div className="relative h-48 w-full">
-                    <Image
-                      src={heroImageSrc}
-                      alt={heroImageAlt}
-                      fill
-                      className="object-cover transition group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                  </div>
-                )}
-                <div className={`${item.heroImage ? 'absolute bottom-0 left-0 right-0 p-6' : 'p-6'}`}>
-                  <h3 className={`text-lg font-semibold ${item.heroImage ? 'text-white' : 'text-slate-900 group-hover:text-[#1E3A8A]'}`}>
-                    {item.name}
-                  </h3>
-                  <span className={`mt-4 inline-flex items-center gap-1 text-sm font-semibold ${item.heroImage ? 'text-white/90' : 'text-[#1E3A8A]'}`}>
-                    View Details <ArrowUpRightIcon className="h-4 w-4" />
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className="mt-16 rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
-          <h2 className="text-2xl font-semibold text-slate-900">Ready to Get Started?</h2>
-          <p className="mt-2 text-slate-600">
-            Contact us to discuss replacement property identification for your 1031 exchange.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-[#1E3A8A] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#162d63]"
+          
+          {/* Social Icons */}
+          <div className="mt-8 flex gap-4">
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-900 transition hover:bg-gray-100"
+              aria-label="Facebook"
             >
-              Get Started <ArrowUpRightIcon className="h-4 w-4" />
-            </Link>
-            <Link
-              href={PHONE_HREF}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-slate-900 transition hover:border-slate-900"
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-900 transition hover:bg-gray-100"
+              aria-label="Instagram"
             >
-              <PhoneIcon className="h-4 w-4" />
-              Call {PHONE_NUMBER}
-            </Link>
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+              </svg>
+            </a>
+            <a
+              href="https://youtube.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-900 transition hover:bg-gray-100"
+              aria-label="YouTube"
+            >
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+            </a>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Property Types Grid - Dark Section */}
+      <section className="section-dark py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <div className="grid gap-x-12 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
+            {propertyTypesData.map((item) => {
+              const heroImageSrc = item.heroImage || `/inventory/${item.slug}-oklahoma-1031-exchange.jpg`;
+              
+              return (
+                <Link
+                  key={item.slug}
+                  href={item.route}
+                  className="group"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    {item.heroImage ? (
+                      <Image
+                        src={heroImageSrc}
+                        alt={item.name}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gray-800 flex items-center justify-center">
+                        <span className="font-heading text-2xl text-gray-600">{item.name}</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <span className="absolute bottom-4 right-4 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gray-900">
+                      Property Type
+                    </span>
+                  </div>
+                  <div className="mt-6 text-center">
+                    <h2 className="font-heading text-xl uppercase tracking-wide">
+                      {item.name}
+                    </h2>
+                    <p className="mt-2 text-sm text-gray-400">
+                      Available nationwide for 1031 exchange replacement.
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Why These Properties Section */}
+      <section className="bg-white py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl text-center">
+            Why These Property Types?
+          </h2>
+          <p className="mt-4 max-w-2xl mx-auto text-center text-gray-600">
+            Our inventory focuses on property types with proven track records for 1031 exchange investors.
+          </p>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">Credit Tenants</h3>
+                  <p className="mt-2 text-sm text-gray-600">
+                    National and regional tenants with strong credit profiles reduce default risk.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">Long-Term Leases</h3>
+                  <p className="mt-2 text-sm text-gray-600">
+                    10-20 year lease terms provide stable, predictable income streams.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">NNN Structure</h3>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Triple net leases minimize landlord responsibilities and operating costs.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">Nationwide Availability</h3>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Properties available across all 50 states for geographic diversification.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">1031 Compliant</h3>
+                  <p className="mt-2 text-sm text-gray-600">
+                    All properties qualify as like-kind replacement for tax-deferred exchanges.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">Passive Income</h3>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Minimal management requirements ideal for hands-off investors.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Work With Us CTA */}
+      <section className="relative overflow-hidden py-28 md:py-36">
+        <div className="absolute inset-0">
+          <Image
+            src="/locations/stillwater-ok-1031-exchange.jpg"
+            alt="Oklahoma property"
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+
+        <div className="absolute left-1/2 top-12 h-16 w-px -translate-x-1/2 bg-white/30" />
+
+        <div className="relative z-10 mx-auto max-w-3xl px-6 text-center text-white md:px-8">
+          <h2 className="font-heading text-4xl uppercase md:text-5xl lg:text-6xl">
+            Work With Us
+          </h2>
+          <p className="mt-6 text-lg leading-relaxed text-white/90">
+            Our team helps you identify the right replacement properties for your 1031 exchange. 
+            Contact us today to explore available inventory nationwide.
+          </p>
+          <Link href="/contact" className="btn-primary mt-8 bg-white text-gray-900 hover:bg-gray-100">
+            Contact Us
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
-
-

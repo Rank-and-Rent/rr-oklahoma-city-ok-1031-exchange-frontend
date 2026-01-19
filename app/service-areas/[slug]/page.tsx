@@ -7,9 +7,7 @@ import { servicesData } from "@/data/services";
 import { locationsBatch01 } from "@/data/batches/locations/batch-01";
 import { locationsBatch02 } from "@/data/batches/locations/batch-02";
 import { locationsBatch03 } from "@/data/batches/locations/batch-03";
-import { SITE_NAME, SITE_URL, PRIMARY_CITY, PRIMARY_STATE_ABBR, PHONE_HREF, PHONE_NUMBER } from "@/lib/config";
-import Breadcrumbs from "@/components/breadcrumbs";
-import { ArrowUpRightIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import { SITE_NAME, SITE_URL, PRIMARY_STATE_ABBR } from "@/lib/config";
 
 function getLocationBySlug(slug: string) {
   return locationsData.find((l) => l.slug === slug);
@@ -42,8 +40,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `1031 Exchange in ${location.name} | ${SITE_NAME}`,
-    description: `Find 1031 exchange support and replacement properties in ${location.name}, ${PRIMARY_STATE_ABBR}.`,
+    title: `${location.name}, ${PRIMARY_STATE_ABBR} Real Estate | ${SITE_NAME}`,
+    description: `Discover ${location.name}, ${PRIMARY_STATE_ABBR} real estate for 1031 exchanges. Market trends, lifestyle guides, and investment opportunities.`,
     alternates: {
       canonical: `${SITE_URL}/service-areas/${slug}`,
     },
@@ -59,135 +57,434 @@ export default async function LocationPage({ params }: Props) {
     notFound();
   }
 
-  // Get relevant services for this location
+  const heroImageSrc = location.heroImage || `/locations/${location.slug}-1031-exchange.jpg`;
   const locationServices = servicesData.slice(0, 6);
 
-  // Use FAQs from batch content if available, otherwise generate defaults
+  // Key facts for the location
+  const keyFacts = [
+    { label: "Area", value: `${location.name} Metro Area` },
+    { label: "County", value: "Oklahoma County" },
+    { label: "State", value: "Oklahoma" },
+    { label: "Population", value: location.name === "Oklahoma City" ? "~700,000 (city) / ~1.4M (metro)" : "See local data" },
+    { label: "Elevation", value: "~1,200 ft (366 m)" },
+    { label: "Signature Attractions", value: "Bricktown, Myriad Gardens, Oklahoma City National Memorial" },
+    { label: "Main Roads", value: "I-35, I-40, I-44" },
+  ];
+
+  // Lifestyle categories
+  const lifestyleCategories = [
+    { title: `Location in ${location.name}`, content: `${location.name} sits in the heart of Oklahoma with easy access to major highways and regional airports.` },
+    { title: `Community in ${location.name}`, content: "A diverse mix of families, professionals, and retirees. Strong neighborhood associations and community events foster year-round connection." },
+    { title: `Dining in ${location.name}`, content: "From upscale steakhouses to authentic international cuisine. Local favorites and national chains serve every palate." },
+    { title: `Education in ${location.name}`, content: "Quality public schools, private academies, and higher education institutions including universities and community colleges." },
+    { title: `Housing in ${location.name}`, content: "Diverse housing options from historic homes to modern developments. Single-family, condos, and luxury properties available." },
+    { title: `Transportation in ${location.name}`, content: "Well-connected road network with expanding public transit. Airport access for regional and national travel." },
+    { title: `Climate in ${location.name}`, content: "Four distinct seasons with warm summers and mild winters. Occasional severe weather requires preparation." },
+    { title: `Amenities in ${location.name}`, content: "Shopping centers, medical facilities, parks, golf courses, and entertainment venues throughout the area." },
+    { title: `Demographics in ${location.name}`, content: "Growing population with diverse economic backgrounds. Strong workforce supporting multiple industries." },
+  ];
+
+  // Market trends data
+  const marketTrends = [
+    { type: "Single-Family Home", medianPrice: "$250,000-$400,000", pricePerSqFt: "$150-$200", avgRent: "$1,500-$2,500/mo", yield: "5-7% (est.)" },
+    { type: "Townhome / Condo", medianPrice: "$180,000-$300,000", pricePerSqFt: "$140-$180", avgRent: "$1,200-$1,800/mo", yield: "5-6% (est.)" },
+    { type: "Multifamily (2-4 units)", medianPrice: "$300,000-$600,000", pricePerSqFt: "$120-$160", avgRent: "$800-$1,200/unit", yield: "6-8% (est.)" },
+    { type: "Commercial / Retail", medianPrice: "$500,000+", pricePerSqFt: "$100-$250", avgRent: "$15-$25/sqft NNN", yield: "6-9% (est.)" },
+  ];
+
+  // FAQs
   const faqs = locationContent?.faqs || [
     {
-      question: `What 1031 exchange services are available in ${location.name}, ${PRIMARY_STATE_ABBR}?`,
-      answer: `We help investors in ${location.name}, ${PRIMARY_STATE_ABBR} identify replacement properties for their 1031 exchanges. Our services include property identification, deadline support, and coordination with qualified intermediaries. This site helps investors identify potential replacement properties.`,
+      question: `How much does it cost to invest in ${location.name}?`,
+      answer: `Investment property prices in ${location.name} vary by type and location. Single-family homes typically range from $200,000-$500,000, while commercial properties start at $500,000+. Contact us for current market data specific to your investment criteria.`,
     },
     {
-      question: `What types of replacement properties are available in ${location.name}, ${PRIMARY_STATE_ABBR}?`,
-      answer: `Investors in ${location.name}, ${PRIMARY_STATE_ABBR} can find replacement properties across multifamily, industrial, retail, office, and other asset types. We help identify like-kind properties that qualify for 1031 exchange treatment.`,
+      question: `Is ${location.name} a good place for investment properties?`,
+      answer: `Yes - ${location.name}'s growing economy, diverse employment base, and population growth make it attractive for real estate investment. Investors target rental properties, commercial spaces, and development opportunities. Cap rates typically range from 5-8% depending on property type.`,
     },
     {
-      question: `How do I meet the 45 and 180 day deadlines in ${location.name}, ${PRIMARY_STATE_ABBR}?`,
-      answer: `The 45 day identification deadline and 180 day closing deadline apply to all 1031 exchanges in ${location.name}, ${PRIMARY_STATE_ABBR}. We help investors meet these deadlines with property lists, documentation support, and timeline tracking.`,
-    },
-    {
-      question: `Do you coordinate with qualified intermediaries in ${location.name}, ${PRIMARY_STATE_ABBR}?`,
-      answer: `We help coordinate with qualified intermediaries for investors in ${location.name}, ${PRIMARY_STATE_ABBR}. This site helps identify replacement properties and can connect you with qualified intermediaries, but we are not a Qualified Intermediary ourselves.`,
+      question: "What is the rental market like?",
+      answer: `Strong rental demand driven by population growth and employment. Long-term rentals perform well, with vacancy rates below the national average. Single-family rentals command $1,500-$2,500/month depending on size and location.`,
     },
   ];
 
-  const heroImageSrc = location.heroImage || `/locations/${location.slug}-1031-exchange.jpg`;
-  const heroImageAlt = `${location.name}, ${PRIMARY_STATE_ABBR} skyline for 1031 exchange`;
-
   return (
     <div className="bg-white">
-      {location.heroImage && (
-        <div className="relative h-64 w-full overflow-hidden md:h-96">
+      {/* Page Title */}
+      <section className="border-b border-gray-100 py-12 pt-24 md:py-16 md:pt-28">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h1 className="font-heading text-4xl uppercase md:text-5xl lg:text-6xl">
+            {location.name}, {PRIMARY_STATE_ABBR} Real Estate
+          </h1>
+          <p className="mt-6 max-w-4xl text-lg leading-relaxed text-gray-600">
+            {location.name} offers excellent opportunities for 1031 exchange investors. 
+            The area combines economic stability, population growth, and diverse property 
+            types suitable for tax-deferred exchanges. Whether you&apos;re looking for 
+            residential rentals, commercial properties, or development land, {location.name} 
+            provides options across all investment strategies.
+          </p>
+        </div>
+      </section>
+
+      {/* Hero Image */}
+      <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
           <Image
             src={heroImageSrc}
-            alt={heroImageAlt}
+          alt={`${location.name}, ${PRIMARY_STATE_ABBR}`}
             fill
             className="object-cover"
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-            <h1 className="text-3xl font-semibold text-white md:text-4xl lg:text-5xl">
-              1031 Exchange in {location.name}
-            </h1>
+      </section>
+
+      {/* Community Overview */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl">
+            {location.name}, {PRIMARY_STATE_ABBR} - Community Overview & Real Estate Guide
+          </h2>
+          <p className="mt-6 max-w-4xl text-base leading-relaxed text-gray-600">
+            {location.name} is one of Oklahoma&apos;s premier destinations for real estate investment. 
+            The area features strong employment, quality schools, and growing infrastructure. 
+            Real estate options range from affordable single-family homes to high-end commercial 
+            developments, all with favorable investment fundamentals for 1031 exchange replacement properties.
+          </p>
+
+          <h3 className="mt-12 font-heading text-xl uppercase">
+            Overview of {location.name}, {PRIMARY_STATE_ABBR}
+          </h3>
+          <p className="mt-4 text-base leading-relaxed text-gray-600">
+            {location.name} sits in the heart of Oklahoma with excellent highway access and 
+            regional connectivity. The area is known for its friendly communities, growing 
+            job market, and affordable cost of living compared to coastal markets. Real estate 
+            here ranges from historic neighborhoods to modern planned developments, all reflecting 
+            the area&apos;s steady appreciation and rental demand.
+          </p>
+
+          {/* Key Facts Table */}
+          <div className="mt-12 overflow-hidden rounded-lg border border-gray-200">
+            <div className="bg-gray-600 px-6 py-4">
+              <h4 className="font-heading text-lg uppercase text-white">
+                Key Facts about {location.name}, {PRIMARY_STATE_ABBR}
+              </h4>
+            </div>
+            <table className="w-full">
+              <tbody className="divide-y divide-gray-200">
+                {keyFacts.map((fact, index) => (
+                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 w-1/3">
+                      {fact.label}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {fact.value}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mt-8 text-base leading-relaxed text-gray-600">
+            {location.name} represents solid fundamentals for real estate investment - stable 
+            population growth, diverse employment, and finite supply supporting resilient 
+            values across market cycles.
+          </p>
+        </div>
+      </section>
+
+      {/* Google Maps */}
+      <section className="py-8">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <div className="aspect-video w-full overflow-hidden rounded-xl bg-gray-100">
+            <iframe
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              style={{ border: 0 }}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(location.name + ", Oklahoma")}&output=embed&zoom=12`}
+              allowFullScreen
+              title={`Map of ${location.name}, ${PRIMARY_STATE_ABBR}`}
+            />
           </div>
         </div>
-      )}
-      <div className="mx-auto max-w-7xl px-6 py-12 md:px-8 md:py-16">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Service Areas", href: "/service-areas" },
-            { label: location.name, href: `/service-areas/${location.slug}` },
-          ]}
-        />
+      </section>
 
-        {!location.heroImage && (
-          <div className="mt-8">
-            <h1 className="text-4xl font-semibold text-slate-900 md:text-5xl">
-              1031 Exchange in {location.name}
-            </h1>
+      {/* Location & Connectivity */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl">
+            Location & Connectivity in {location.name}
+          </h2>
+          <p className="mt-6 max-w-4xl text-base leading-relaxed text-gray-600">
+            {location.name} offers excellent connectivity in a central Oklahoma location. 
+            Major highways provide easy access to regional markets, while the local 
+            airport offers connections to major hubs. The area is well-connected with 
+            growing infrastructure supporting both residents and businesses.
+          </p>
+
+          {/* Connectivity Table */}
+          <div className="mt-12 overflow-hidden rounded-lg border border-gray-200">
+            <div className="bg-gray-600 px-6 py-4">
+              <h4 className="font-heading text-lg uppercase text-white">
+                Connectivity & Transportation - {location.name}, {PRIMARY_STATE_ABBR}
+              </h4>
+            </div>
+            <table className="w-full">
+              <tbody className="divide-y divide-gray-200">
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900 w-1/3">Location Map & Overview</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    Central Oklahoma location with easy access to I-35 and I-40 corridors. 
+                    Strategic position for regional commerce and investment.
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Nearby Areas & Communities</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <ul className="list-disc pl-4 space-y-1">
+                      <li>Edmond - affluent suburb with excellent schools</li>
+                      <li>Norman - university town with steady rental demand</li>
+                      <li>Moore - growing suburban community</li>
+                      <li>Midwest City - established suburb near Tinker AFB</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Road Access & Main Highways</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <ul className="list-disc pl-4 space-y-1">
+                      <li>I-35 - major north-south corridor connecting Texas to Kansas</li>
+                      <li>I-40 - east-west interstate across the southern US</li>
+                      <li>I-44 - connects to Tulsa and points northeast</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Airport Access</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    Will Rogers World Airport (OKC) - ~15 minutes from downtown; 
+                    direct flights to major US cities. Wiley Post Airport for general aviation.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        )}
-        {locationContent?.mainDescription && (
-          <div className={`${location.heroImage ? 'mt-8' : 'mt-4'} prose prose-slate max-w-none`} dangerouslySetInnerHTML={{ __html: locationContent.mainDescription }} />
-        )}
+        </div>
+      </section>
 
-        <div className="mt-12">
-          <h2 className="text-2xl font-semibold text-slate-900">Frequently Asked Questions</h2>
-          <div className="mt-6 space-y-6">
-            {faqs.map((faq, index) => (
-              <div key={index}>
-                <h3 className="text-lg font-semibold text-slate-900">{faq.question}</h3>
-                <p className="mt-2 text-base text-slate-600">{faq.answer}</p>
+      {/* Market Trends */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl">
+            {location.name} Real Estate Market Trends (2025)
+          </h2>
+          <p className="mt-6 max-w-4xl text-base leading-relaxed text-gray-600">
+            {location.name}&apos;s market is defined by steady growth, affordable entry points, 
+            and strong rental fundamentals. Investors find opportunities across residential 
+            and commercial sectors with competitive cap rates compared to coastal markets.
+          </p>
+
+          {/* Market Table */}
+          <div className="mt-12 overflow-x-auto">
+            <table className="w-full min-w-[700px]">
+              <thead>
+                <tr className="bg-gray-600 text-white">
+                  <th className="px-6 py-4 text-left text-sm font-heading uppercase">Property Type</th>
+                  <th className="px-6 py-4 text-left text-sm font-heading uppercase">Median Price (USD)</th>
+                  <th className="px-6 py-4 text-left text-sm font-heading uppercase">Price per Sq.Ft (USD)</th>
+                  <th className="px-6 py-4 text-left text-sm font-heading uppercase">Average Rent (USD/month)</th>
+                  <th className="px-6 py-4 text-left text-sm font-heading uppercase">Rental Yield*</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {marketTrends.map((row, index) => (
+                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="px-6 py-4 text-sm text-gray-900">{row.type}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{row.medianPrice}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{row.pricePerSqFt}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{row.avgRent}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{row.yield}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-xs text-gray-500 italic">
+            *Methodology & Notes: Estimates based on current market conditions. Actual yields vary by 
+            location, property condition, and management. Contact us for detailed analysis.
+          </p>
+        </div>
+      </section>
+
+      {/* Second Hero Image */}
+      <section className="relative h-[40vh] min-h-[300px] overflow-hidden">
+        <Image
+          src={`/locations/${locationsData[1]?.slug || "edmond-ok"}-1031-exchange.jpg`}
+          alt={`${location.name} area`}
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+      </section>
+
+      {/* Lifestyle Section */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl">
+            Lifestyle in {location.name}
+          </h2>
+          <p className="mt-6 max-w-4xl text-base leading-relaxed text-gray-600">
+            {location.name} balances urban convenience with community warmth. The area offers 
+            diverse neighborhoods, quality schools, and year-round activities. Its affordable 
+            cost of living and strong job market make it attractive for residents and 
+            investors alike.
+          </p>
+
+          {/* Lifestyle Grid */}
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {lifestyleCategories.map((category, index) => (
+              <div key={index} className="rounded-lg border border-gray-200 p-6">
+                <div className="flex items-start gap-3">
+                  <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-heading text-sm uppercase tracking-wide">
+                      {category.title}
+                    </h3>
+                    <p className="mt-3 text-sm text-gray-600">
+                      {category.content}
+                    </p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        <div className="mt-12">
-          <h2 className="text-2xl font-semibold text-slate-900">Services Available</h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {/* Investment Potential */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl">
+            Investment Potential in {location.name}, {PRIMARY_STATE_ABBR}
+          </h2>
+          <p className="mt-6 max-w-4xl text-base leading-relaxed text-gray-600">
+            {location.name} consistently ranks among Oklahoma&apos;s strongest markets for real estate 
+            investment, driven by population growth, employment diversification, and affordable 
+            entry points. Investors benefit from strong rental demand and appreciation potential.
+          </p>
+
+          {/* Investment Highlights */}
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">
+                    Rental Snapshot in {location.name}
+                  </h3>
+                  <div className="mt-3 space-y-2 text-sm text-gray-600">
+                    <p><strong>Single-Family Homes:</strong> $1,500-$2,500/mo</p>
+                    <p><strong>Apartments:</strong> $900-$1,500/mo</p>
+                    <p><strong>Commercial:</strong> $12-$25/sqft NNN</p>
+                    <p className="italic text-xs">Premiums for newer construction and prime locations.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">
+                    What Performs Well in {location.name}
+                  </h3>
+                  <ul className="mt-3 space-y-2 text-sm text-gray-600 list-disc pl-4">
+                    <li>Single-family rentals in quality school districts</li>
+                    <li>Multifamily near employment centers</li>
+                    <li>NNN retail with national tenants</li>
+                    <li>Medical office near hospitals</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQs */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-center text-3xl uppercase md:text-4xl">
+            Frequently Asked Questions About {location.name}, {PRIMARY_STATE_ABBR}
+          </h2>
+
+          <div className="mt-12 space-y-6">
+            {faqs.map((faq, index) => (
+              <div key={index} className="overflow-hidden rounded-lg border border-gray-200">
+                <div className="bg-gray-600 px-6 py-4">
+                  <h3 className="text-base font-medium text-white">{faq.question}</h3>
+                </div>
+                <div className="bg-white px-6 py-4">
+                  <p className="text-sm text-gray-600">{faq.answer}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Available Services */}
+      <section className="section-dark py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-center text-3xl uppercase md:text-4xl">
+            1031 Exchange Services in {location.name}
+          </h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {locationServices.map((service) => (
               <Link
                 key={service.slug}
                 href={service.route}
-                className="rounded-xl border border-slate-200 bg-white p-6 transition hover:border-[#1E3A8A]"
+                className="group rounded-lg border border-gray-700 bg-gray-800/50 p-6 transition hover:border-gray-500"
               >
-                <h3 className="text-lg font-semibold text-slate-900">{service.name}</h3>
-                <p className="mt-2 text-sm text-slate-600">{service.short}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#1E3A8A]">
-                  Learn more <ArrowUpRightIcon className="h-4 w-4" />
-                </span>
+                <h3 className="font-heading text-lg uppercase">{service.name}</h3>
+                <p className="mt-2 text-sm text-gray-400">{service.short}</p>
               </Link>
             ))}
           </div>
         </div>
+      </section>
 
-        <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
-          <h2 className="text-2xl font-semibold text-slate-900">Ready to Get Started?</h2>
-          <p className="mt-2 text-slate-600">
-            Contact us to discuss 1031 exchange support in {location.name}, {PRIMARY_STATE_ABBR}.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href={`/contact?city=${encodeURIComponent(location.name)}`}
-              className="inline-flex items-center gap-2 rounded-full bg-[#1E3A8A] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#162d63]"
-            >
-              Get Started <ArrowUpRightIcon className="h-4 w-4" />
-            </Link>
-            <Link
-              href={PHONE_HREF}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-slate-900 transition hover:border-slate-900"
-            >
-              <PhoneIcon className="h-4 w-4" />
-              Call {PHONE_NUMBER}
-            </Link>
-          </div>
+      {/* Work With Us CTA */}
+      <section className="relative overflow-hidden py-28 md:py-36">
+        <div className="absolute inset-0">
+          <Image
+            src={`/locations/${locationsData[2]?.slug || "norman-ok"}-1031-exchange.jpg`}
+            alt="Oklahoma property"
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-black/50" />
         </div>
 
-        <div className="mt-8 text-center">
-          <Link
-            href="/service-areas"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 transition hover:text-[#1E3A8A]"
-          >
-            View All {locationsData.length} Service Areas <ArrowUpRightIcon className="h-4 w-4" />
+        <div className="absolute left-1/2 top-12 h-16 w-px -translate-x-1/2 bg-white/30" />
+
+        <div className="relative z-10 mx-auto max-w-3xl px-6 text-center text-white md:px-8">
+          <h2 className="font-heading text-4xl uppercase md:text-5xl lg:text-6xl">
+            Work With Us
+          </h2>
+          <p className="mt-6 text-lg leading-relaxed text-white/90">
+            Our team approaches Oklahoma&apos;s real estate landscape with an auspicious blend of 
+            experience, deep community ties and forward thinking. Contact us today to get 
+            started on your 1031 exchange journey with the experts for {location.name} Real Estate.
+          </p>
+          <Link href="/contact" className="btn-primary mt-8 bg-white text-gray-900 hover:bg-gray-100">
+            Contact Us
           </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
-

@@ -4,9 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { propertyTypesData } from "@/data/property-types";
 import { inventorySpotlight01 } from "@/data/batches/inventory/batch-01";
-import { SITE_NAME, SITE_URL, PRIMARY_CITY, PRIMARY_STATE_ABBR, PHONE_HREF, PHONE_NUMBER } from "@/lib/config";
-import Breadcrumbs from "@/components/breadcrumbs";
-import { ArrowUpRightIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import { SITE_NAME, SITE_URL, PRIMARY_CITY, PRIMARY_STATE_ABBR } from "@/lib/config";
 
 function getPropertyTypeBySlug(slug: string) {
   return propertyTypesData.find((pt) => pt.slug === slug);
@@ -16,7 +14,7 @@ function getPropertyTypeContent(slug: string) {
   return inventorySpotlight01.find((item) => item.type === slug);
 }
 
-function getRelatedPropertyTypes(currentSlug: string, limit: number = 4) {
+function getRelatedPropertyTypes(currentSlug: string, limit: number = 6) {
   return propertyTypesData.filter((pt) => pt.slug !== currentSlug).slice(0, limit);
 }
 
@@ -61,169 +59,287 @@ export default async function PropertyTypePage({ params }: Props) {
     notFound();
   }
 
-  const relatedPropertyTypes = getRelatedPropertyTypes(slug, 4);
+  const relatedPropertyTypes = getRelatedPropertyTypes(slug, 6);
   const heroImageSrc = propertyType.heroImage || `/inventory/${propertyType.slug}-oklahoma-1031-exchange.jpg`;
-  const heroImageAlt = `${propertyType.name} property type`;
+
+  // Key investment metrics
+  const investmentMetrics = [
+    { label: "Typical Cap Rate", value: "5.5% - 7.5%" },
+    { label: "Lease Term", value: "10-20 years" },
+    { label: "Lease Type", value: "NNN (Triple Net)" },
+    { label: "Tenant Credit", value: "Investment Grade" },
+    { label: "Annual Increases", value: "1-2% or CPI" },
+    { label: "Price Range", value: "$1M - $10M+" },
+  ];
+
+  // Benefits specific to this property type
+  const propertyBenefits = [
+    { title: "Stable Cash Flow", description: "Consistent monthly income from credit-rated tenants" },
+    { title: "Minimal Management", description: "NNN structure means tenant handles most expenses" },
+    { title: "Long-Term Security", description: "Extended lease terms provide predictable returns" },
+    { title: "Appreciation Potential", description: "Well-located properties gain value over time" },
+    { title: "1031 Qualified", description: "All properties meet like-kind exchange requirements" },
+    { title: "Nationwide Options", description: "Available across all 50 states for diversification" },
+  ];
 
   const faqs = [
     {
       question: `What are ${propertyType.name.toLowerCase()} properties?`,
-      answer: content?.copy || `${propertyType.name} properties are available for 1031 exchange replacement. These properties offer stable cash flow and long-term lease commitments suitable for tax-deferred exchanges.`,
+      answer: content?.copy || `${propertyType.name} properties are commercial real estate assets featuring established tenants with long-term lease commitments. These properties are popular with 1031 exchange investors seeking stable, passive income.`,
     },
     {
-      question: `Are ${propertyType.name.toLowerCase()} properties suitable for 1031 exchange in ${PRIMARY_CITY}, ${PRIMARY_STATE_ABBR}?`,
-      answer: `Yes, ${propertyType.name.toLowerCase()} properties qualify as like-kind replacement properties for 1031 exchanges in ${PRIMARY_CITY}, ${PRIMARY_STATE_ABBR}. These properties are held for investment purposes and meet IRS requirements for like-kind exchange treatment.`,
+      question: `Are ${propertyType.name.toLowerCase()} properties suitable for 1031 exchange?`,
+      answer: `Yes, ${propertyType.name.toLowerCase()} properties qualify as like-kind replacement properties for 1031 exchanges. These properties are held for investment purposes and meet IRS requirements for tax-deferred exchange treatment.`,
     },
     {
       question: `What should I consider when identifying ${propertyType.name.toLowerCase()} replacement properties?`,
-      answer: `When identifying ${propertyType.name.toLowerCase()} replacement properties for your 1031 exchange, consider location, tenant credit quality, lease terms, property condition, and market fundamentals. We help investors evaluate these factors within the 45 day identification deadline.`,
+      answer: `Key factors include tenant credit quality, lease term remaining, rent escalation structure, property condition, location fundamentals, and cap rate relative to market. We help investors evaluate these factors within the 45-day identification deadline.`,
     },
     {
-      question: `How do I get started with ${propertyType.name.toLowerCase()} replacement properties?`,
-      answer: `Contact us to discuss ${propertyType.name.toLowerCase()} replacement property identification for your 1031 exchange in ${PRIMARY_CITY}, ${PRIMARY_STATE_ABBR}. We can help identify suitable properties and coordinate with qualified intermediaries to meet your 45 and 180 day deadlines.`,
+      question: `How do I get started?`,
+      answer: `Contact us to discuss ${propertyType.name.toLowerCase()} replacement property identification for your 1031 exchange. We can help identify suitable properties nationwide and coordinate with qualified intermediaries to meet your deadlines.`,
     },
   ];
 
   return (
     <div className="bg-white">
+      {/* Page Title */}
+      <section className="border-b border-gray-100 py-12 pt-24 md:py-16 md:pt-28">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h1 className="font-heading text-4xl uppercase md:text-5xl lg:text-6xl">
+            {propertyType.name}
+          </h1>
+          <p className="mt-2 text-lg text-gray-500">
+            1031 Exchange Replacement Properties
+          </p>
+          <p className="mt-6 max-w-4xl text-lg leading-relaxed text-gray-600">
+            {content?.copy || `${propertyType.name} properties offer stable cash flow and long-term lease commitments, making them ideal replacement properties for 1031 exchanges. Available nationwide with credit-rated tenants.`}
+          </p>
+        </div>
+      </section>
+
+      {/* Hero Image */}
       {propertyType.heroImage && (
-        <div className="relative h-64 w-full overflow-hidden md:h-96">
+        <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
           <Image
             src={heroImageSrc}
-            alt={heroImageAlt}
+            alt={propertyType.name}
             fill
             className="object-cover"
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-            <h1 className="text-3xl font-semibold text-white md:text-4xl lg:text-5xl">
-              {propertyType.name}
-            </h1>
-            <p className="mt-2 text-lg text-white/90 md:text-xl">
-              1031 Exchange Replacement Properties
-            </p>
+        </section>
+      )}
+
+      {/* Property Overview */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl">
+            {propertyType.name} - Investment Overview & Guide
+          </h2>
+          <p className="mt-6 max-w-4xl text-base leading-relaxed text-gray-600">
+            {propertyType.name} properties represent a significant category in the 1031 exchange 
+            replacement market. These assets typically feature national or regional tenants 
+            operating under long-term lease agreements, providing investors with predictable 
+            income streams and minimal management responsibilities.
+          </p>
+
+          {/* Investment Metrics Table */}
+          <div className="mt-12 overflow-hidden rounded-lg border border-gray-200">
+            <div className="bg-gray-600 px-6 py-4">
+              <h4 className="font-heading text-lg uppercase text-white">
+                Key Investment Metrics for {propertyType.name}
+              </h4>
+            </div>
+            <table className="w-full">
+              <tbody className="divide-y divide-gray-200">
+                {investmentMetrics.map((metric, index) => (
+                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 w-1/3">
+                      {metric.label}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {metric.value}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-xs text-gray-500 italic">
+            *Metrics are indicative ranges and vary by specific property, location, and market conditions.
+          </p>
+        </div>
+      </section>
+
+      {/* Benefits Grid */}
+      <section className="bg-gray-50 py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl">
+            Investment Benefits
+          </h2>
+          <p className="mt-4 max-w-2xl text-base text-gray-600">
+            Why investors choose {propertyType.name.toLowerCase()} properties for 1031 exchanges.
+          </p>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {propertyBenefits.map((benefit, index) => (
+              <div key={index} className="rounded-lg border border-gray-200 bg-white p-6">
+                <div className="flex items-start gap-3">
+                  <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-heading text-sm uppercase tracking-wide">
+                      {benefit.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-gray-600">
+                      {benefit.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      )}
-      
-      <div className="mx-auto max-w-7xl px-6 py-12 md:px-8 md:py-16">
-        {!propertyType.heroImage && (
-          <>
-            <Breadcrumbs
-              items={[
-                { label: "Home", href: "/" },
-                { label: "Inventory", href: "/inventory" },
-                { label: propertyType.name, href: propertyType.route },
-              ]}
-            />
-            <div className="mt-8">
-              <h1 className="text-4xl font-semibold text-slate-900 md:text-5xl">{propertyType.name}</h1>
-            </div>
-          </>
-        )}
+      </section>
 
-        {propertyType.heroImage && (
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Inventory", href: "/inventory" },
-              { label: propertyType.name, href: propertyType.route },
-            ]}
-            className="mt-8"
-          />
-        )}
+      {/* Second Image */}
+      <section className="relative h-[40vh] min-h-[300px] overflow-hidden">
+        <Image
+          src="/locations/oklahoma-city-ok-1031-exchange.jpg"
+          alt={`${propertyType.name} investment`}
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+      </section>
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <div className="prose prose-slate max-w-none">
-              <p className="text-lg text-slate-700">
-                {content?.copy || `${propertyType.name} properties are available nationwide for 1031 exchange replacement. These properties offer stable cash flow with established tenants and long-term lease commitments suitable for tax-deferred exchanges.`}
-              </p>
-              
-              <h2 className="mt-8 text-2xl font-semibold text-slate-900">Property Overview</h2>
-              <p className="text-base text-slate-700">
-                {propertyType.name} properties provide investors with opportunities to complete 1031 exchanges while maintaining consistent rental income. These properties typically feature credit tenants, long-term lease agreements, and stable operational performance that supports tax-deferred exchange strategies.
-              </p>
+      {/* 1031 Exchange Considerations */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-3xl uppercase md:text-4xl">
+            1031 Exchange Considerations for {propertyType.name}
+          </h2>
+          <p className="mt-6 max-w-4xl text-base leading-relaxed text-gray-600">
+            When identifying {propertyType.name.toLowerCase()} properties as replacement assets 
+            for your 1031 exchange, several factors deserve careful consideration to ensure 
+            both compliance and investment success.
+          </p>
 
-              <h2 className="mt-8 text-2xl font-semibold text-slate-900">1031 Exchange Benefits</h2>
-              <ul className="list-disc pl-6 text-base text-slate-700">
-                <li>Like-kind replacement property qualification for tax deferral</li>
-                <li>Stable cash flow from established tenant operations</li>
-                <li>Long-term lease commitments supporting exchange compliance</li>
-                <li>Nationwide availability for flexible replacement property identification</li>
-                <li>Credit tenant profiles reducing operational risk</li>
-              </ul>
-
-              <h2 className="mt-8 text-2xl font-semibold text-slate-900">Identification Process</h2>
-              <p className="text-base text-slate-700">
-                When identifying {propertyType.name.toLowerCase()} replacement properties for your 1031 exchange, we help investors evaluate property locations, tenant credit profiles, lease terms, and market fundamentals. Our property identification support helps you meet the 45 day identification deadline with qualified replacement properties.
-              </p>
-            </div>
-
-            <div className="mt-12">
-              <h2 className="text-2xl font-semibold text-slate-900">Frequently Asked Questions</h2>
-              <div className="mt-6 space-y-6">
-                {faqs.map((faq, index) => (
-                  <div key={index}>
-                    <h3 className="text-lg font-semibold text-slate-900">{faq.question}</h3>
-                    <p className="mt-2 text-base text-slate-600">{faq.answer}</p>
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">
+                    Identification Timeline
+                  </h3>
+                  <div className="mt-3 space-y-2 text-sm text-gray-600">
+                    <p><strong>45 Days:</strong> Identify replacement properties in writing</p>
+                    <p><strong>180 Days:</strong> Complete acquisition of replacement property</p>
+                    <p><strong>Tip:</strong> Start identifying properties before closing on your relinquished property</p>
                   </div>
-                ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-gray-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-heading text-sm uppercase tracking-wide">
+                    Value Requirements
+                  </h3>
+                  <div className="mt-3 space-y-2 text-sm text-gray-600">
+                    <p><strong>Equal or Greater:</strong> Replacement value should meet or exceed relinquished property</p>
+                    <p><strong>Debt Replacement:</strong> New debt should equal or exceed old debt to avoid boot</p>
+                    <p><strong>Tip:</strong> Consult with your CPA for specific calculations</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="lg:col-span-1">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Related Property Types</h3>
-              <ul className="mt-4 space-y-3">
-                {relatedPropertyTypes.map((related) => (
-                  <li key={related.slug}>
-                    <Link
-                      href={related.route}
-                      className="block text-sm font-medium text-slate-700 transition hover:text-[#1E3A8A]"
-                    >
-                      {related.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+      {/* FAQs */}
+      <section className="bg-gray-50 py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-center text-3xl uppercase md:text-4xl">
+            Frequently Asked Questions
+          </h2>
+
+          <div className="mt-12 space-y-6 max-w-4xl mx-auto">
+            {faqs.map((faq, index) => (
+              <div key={index} className="overflow-hidden rounded-lg border border-gray-200">
+                <div className="bg-gray-600 px-6 py-4">
+                  <h3 className="text-base font-medium text-white">{faq.question}</h3>
+                </div>
+                <div className="bg-white px-6 py-4">
+                  <p className="text-sm text-gray-600">{faq.answer}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Related Property Types */}
+      <section className="section-dark py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <h2 className="font-heading text-center text-3xl uppercase md:text-4xl">
+            Other Property Types
+          </h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {relatedPropertyTypes.map((related) => (
               <Link
-                href="/inventory"
-                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#1E3A8A] transition hover:text-[#162d63]"
+                key={related.slug}
+                href={related.route}
+                className="group rounded-lg border border-gray-700 bg-gray-800/50 p-6 transition hover:border-gray-500"
               >
-                View All Property Types <ArrowUpRightIcon className="h-4 w-4" />
+                <h3 className="font-heading text-lg uppercase">{related.name}</h3>
+                <p className="mt-2 text-sm text-gray-400">
+                  Available nationwide for 1031 exchange replacement.
+                </p>
               </Link>
-            </div>
+            ))}
           </div>
+          <div className="mt-8 text-center">
+            <Link href="/inventory" className="btn-white">
+              View All Property Types
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Work With Us CTA */}
+      <section className="relative overflow-hidden py-28 md:py-36">
+        <div className="absolute inset-0">
+          <Image
+            src="/locations/edmond-ok-1031-exchange.jpg"
+            alt="Oklahoma property"
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-black/50" />
         </div>
 
-        <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
-          <h2 className="text-2xl font-semibold text-slate-900">Ready to Get Started?</h2>
-          <p className="mt-2 text-slate-600">
-            Contact us to discuss {propertyType.name.toLowerCase()} replacement property identification for your 1031 exchange in {PRIMARY_CITY}, {PRIMARY_STATE_ABBR}.
+        <div className="absolute left-1/2 top-12 h-16 w-px -translate-x-1/2 bg-white/30" />
+
+        <div className="relative z-10 mx-auto max-w-3xl px-6 text-center text-white md:px-8">
+          <h2 className="font-heading text-4xl uppercase md:text-5xl lg:text-6xl">
+            Work With Us
+          </h2>
+          <p className="mt-6 text-lg leading-relaxed text-white/90">
+            Ready to explore {propertyType.name.toLowerCase()} properties for your 1031 exchange? 
+            Our team helps you identify the right replacement properties nationwide.
           </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href={`/contact?propertyType=${encodeURIComponent(propertyType.name)}`}
-              className="inline-flex items-center gap-2 rounded-full bg-[#1E3A8A] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#162d63]"
-            >
-              Get Started <ArrowUpRightIcon className="h-4 w-4" />
-            </Link>
-            <Link
-              href={PHONE_HREF}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-slate-900 transition hover:border-slate-900"
-            >
-              <PhoneIcon className="h-4 w-4" />
-              Call {PHONE_NUMBER}
-            </Link>
-          </div>
+          <Link href="/contact" className="btn-primary mt-8 bg-white text-gray-900 hover:bg-gray-100">
+            Contact Us
+          </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
-
-
